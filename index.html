@@ -1,0 +1,3742 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="theme-color" content="#2563eb" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="DE Flashcards" />
+    <title>German Flashcards — A1 & A2</title>
+    <link rel="manifest" href="manifest.json" />
+    <link rel="apple-touch-icon" href="icon-192.png" />
+    <link rel="icon" type="image/png" href="icon-192.png" />
+    <style>
+        :root {
+            --bg-body: #f1f5f9;
+            --bg-card: #ffffff;
+            --bg-surface: #ffffff;
+            --bg-surface-alt: #f8fafc;
+            --bg-input: #fafcff;
+            --bg-hover: #f1f5f9;
+            --bg-active: #dbeafe;
+            --bg-weak-item: #f8fafc;
+            --text-primary: #0f172a;
+            --text-secondary: #475569;
+            --text-muted: #64748b;
+            --text-light: #94a3b8;
+            --border-color: #e2e8f0;
+            --border-light: #f1f5f9;
+            --shadow-card: 0 12px 30px rgba(0, 0, 0, 0.08), 0 4px 10px rgba(0, 0, 0, 0.04);
+            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.05);
+            --shadow-hover: 0 8px 25px rgba(0, 0, 0, 0.12);
+            --accent-blue: #2563eb;
+            --accent-blue-hover: #1d4ed8;
+            --accent-green: #22c55e;
+            --accent-green-hover: #16a34a;
+            --accent-red: #ef4444;
+            --accent-red-hover: #dc2626;
+            --accent-yellow: #f59e0b;
+            --accent-yellow-hover: #d97706;
+            --accent-purple: #8b5cf6;
+            --accent-purple-hover: #7c3aed;
+            --accent-gray: #e2e8f0;
+            --accent-gray-hover: #cbd5e1;
+            --flashcard-front-bg: #ffffff;
+            --flashcard-back-bg: #ffffff;
+            --progress-bar-bg: #e2e8f0;
+            --progress-fill: #2563eb;
+            --weak-item-border: #f1f5f9;
+            --scrollbar-track: #f1f5f9;
+            --scrollbar-thumb: #cbd5e1;
+            --scrollbar-thumb-hover: #94a3b8;
+        }
+        [data-theme="dark"] {
+            --bg-body: #0f172a;
+            --bg-card: #1e293b;
+            --bg-surface: #1e293b;
+            --bg-surface-alt: #334155;
+            --bg-input: #1e293b;
+            --bg-hover: #334155;
+            --bg-active: #1e3a5f;
+            --bg-weak-item: #1e293b;
+            --text-primary: #f1f5f9;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            --text-light: #475569;
+            --border-color: #334155;
+            --border-light: #1e293b;
+            --shadow-card: 0 12px 30px rgba(0, 0, 0, 0.4), 0 4px 10px rgba(0, 0, 0, 0.2);
+            --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.2);
+            --shadow-hover: 0 8px 25px rgba(0, 0, 0, 0.5);
+            --accent-blue: #3b82f6;
+            --accent-blue-hover: #60a5fa;
+            --flashcard-front-bg: #1e293b;
+            --flashcard-back-bg: #1e293b;
+            --progress-bar-bg: #334155;
+            --progress-fill: #3b82f6;
+            --weak-item-border: #334155;
+            --scrollbar-track: #1e293b;
+            --scrollbar-thumb: #475569;
+            --scrollbar-thumb-hover: #64748b;
+            --accent-gray: #334155;
+            --accent-gray-hover: #475569;
+        }
+
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        body {
+            font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+            background: var(--bg-body);
+            color: var(--text-primary);
+            padding: 1.5rem;
+            padding-top: max(1.5rem, env(safe-area-inset-top));
+            padding-bottom: max(1.5rem, env(safe-area-inset-bottom));
+            max-width: 900px;
+            margin: 0 auto;
+            min-height: 100vh;
+            transition: background 0.3s ease, color 0.3s ease;
+            overscroll-behavior-y: contain;
+        }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: var(--scrollbar-track); border-radius: 3px; }
+        ::-webkit-scrollbar-thumb { background: var(--scrollbar-thumb); border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--scrollbar-thumb-hover); }
+
+        h1 {
+            font-size: 1.8rem;
+            border-left: 5px solid var(--accent-blue);
+            padding-left: 1rem;
+            margin-bottom: 0.25rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+        }
+        .subhead {
+            color: var(--text-secondary);
+            margin-top: -0.25rem;
+            margin-bottom: 1.5rem;
+            padding-left: 1.5rem;
+            font-size: 0.95rem;
+        }
+
+        /* Level switcher */
+        .level-switcher {
+            display: flex;
+            gap: 0.5rem;
+            background: var(--bg-surface);
+            padding: 0.4rem;
+            border-radius: 0.75rem;
+            border: 1px solid var(--border-color);
+            margin-bottom: 0.75rem;
+            box-shadow: var(--shadow-sm);
+            transition: background 0.3s ease, border-color 0.3s ease;
+        }
+        .level-switcher button {
+            flex: 1;
+            padding: 0.6rem 1rem;
+            border: 2px solid transparent;
+            border-radius: 0.5rem;
+            font-weight: 700;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.15s;
+            background: transparent;
+            color: var(--text-secondary);
+        }
+        .level-switcher button:hover { background: var(--bg-hover); }
+        .level-switcher button.active {
+            background: var(--accent-blue);
+            color: white;
+            border-color: var(--accent-blue);
+            box-shadow: 0 2px 8px rgba(37, 99, 235, 0.3);
+        }
+        .level-switcher button .badge {
+            display: block;
+            font-size: 0.65rem;
+            font-weight: 400;
+            opacity: 0.85;
+            margin-top: 0.1rem;
+        }
+
+        .tab-selector {
+            display: flex;
+            gap: 0.4rem;
+            background: var(--bg-surface);
+            padding: 0.5rem;
+            border-radius: 0.75rem;
+            border: 1px solid var(--border-color);
+            margin-bottom: 1rem;
+            box-shadow: var(--shadow-sm);
+            flex-wrap: wrap;
+            transition: background 0.3s ease, border-color 0.3s ease;
+        }
+        .tab-selector button {
+            flex: 1;
+            min-width: 90px;
+            padding: 0.5rem 0.7rem;
+            border: 2px solid transparent;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            font-size: 0.78rem;
+            cursor: pointer;
+            transition: background 0.15s, border-color 0.15s, color 0.15s;
+            background: transparent;
+            color: var(--text-secondary);
+            white-space: nowrap;
+        }
+        .tab-selector button:hover { background: var(--bg-hover); }
+        .tab-selector button.active {
+            border-color: var(--accent-blue);
+            background: var(--bg-active);
+            color: var(--accent-blue);
+        }
+
+        .top-bar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            align-items: center;
+            justify-content: space-between;
+            background: var(--bg-surface);
+            padding: 0.75rem 1.25rem;
+            border-radius: 0.75rem;
+            border: 1px solid var(--border-color);
+            margin-bottom: 1rem;
+            box-shadow: var(--shadow-sm);
+            transition: background 0.3s ease, border-color 0.3s ease;
+        }
+        .top-bar .filter-area {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .top-bar .filter-area input {
+            padding: 0.35rem 0.7rem;
+            border: 1px solid var(--border-color);
+            border-radius: 0.375rem;
+            font-size: 0.9rem;
+            background: var(--bg-input);
+            color: var(--text-primary);
+            width: 160px;
+            transition: background 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+        }
+        .top-bar .filter-area input:focus {
+            outline: 2px solid var(--accent-blue);
+            outline-offset: 1px;
+            border-color: transparent;
+        }
+        .top-bar .filter-area input::placeholder { color: var(--text-muted); }
+        .top-bar .filter-area .count-badge {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 0.4rem;
+            flex-wrap: wrap;
+        }
+        .btn-group button {
+            padding: 0.35rem 0.9rem;
+            border: 2px solid var(--border-color);
+            border-radius: 0.4rem;
+            font-weight: 600;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: background 0.15s, transform 0.1s, border-color 0.15s, color 0.15s;
+            background: transparent;
+            color: var(--text-secondary);
+        }
+        .btn-group button:active { transform: scale(0.95); }
+        .btn-group button:hover { background: var(--bg-hover); }
+        .btn-group button.active {
+            border-color: var(--accent-blue);
+            background: var(--bg-active);
+            color: var(--accent-blue);
+        }
+
+        .theme-toggle {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.8rem;
+            color: var(--text-secondary);
+            margin-left: auto;
+        }
+        .theme-toggle .switch {
+            position: relative;
+            width: 44px;
+            height: 24px;
+            background: var(--border-color);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+            flex-shrink: 0;
+            border: 2px solid var(--border-color);
+        }
+        .theme-toggle .switch .slider {
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 16px;
+            height: 16px;
+            background: white;
+            border-radius: 50%;
+            transition: transform 0.3s ease, background 0.3s ease;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+        }
+        [data-theme="dark"] .theme-toggle .switch {
+            background: var(--accent-blue);
+            border-color: var(--accent-blue);
+        }
+        [data-theme="dark"] .theme-toggle .switch .slider {
+            transform: translateX(20px);
+            background: white;
+        }
+        .theme-toggle .icon { font-size: 1rem; line-height: 1; }
+
+        .card-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 300px;
+            perspective: 1000px;
+            margin: 0.5rem 0;
+        }
+        .flashcard {
+            width: 100%;
+            max-width: 600px;
+            min-height: 280px;
+            background: var(--flashcard-front-bg);
+            border-radius: 1.25rem;
+            box-shadow: var(--shadow-card);
+            border: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem 2rem 1.8rem;
+            cursor: pointer;
+            position: relative;
+            transition: transform 0.4s ease, box-shadow 0.3s ease, background 0.3s ease, border-color 0.3s ease;
+            transform-style: preserve-3d;
+        }
+        .flashcard:hover { box-shadow: var(--shadow-hover); }
+        .flashcard.flipped { transform: rotateY(180deg); }
+        .flashcard .front,
+        .flashcard .back {
+            width: 100%;
+            backface-visibility: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+        }
+        .flashcard .back {
+            transform: rotateY(180deg);
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            padding: 1.75rem 2rem;
+            border-radius: 1.25rem;
+            background: var(--flashcard-back-bg);
+            border: 1px solid var(--border-color);
+        }
+        .flashcard .front .en {
+            font-size: 1.8rem;
+            font-weight: 500;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+            line-height: 1.3;
+            transition: color 0.3s ease;
+        }
+        .flashcard .front .hint {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            background: var(--bg-hover);
+            padding: 0.2rem 1rem;
+            border-radius: 1rem;
+            margin-top: 0.25rem;
+            transition: background 0.3s ease, color 0.3s ease;
+        }
+        .flashcard .back .form {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--accent-blue);
+            letter-spacing: 0.5px;
+            transition: color 0.3s ease;
+            line-height: 1.4;
+        }
+        .flashcard .back .person-label {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-top: 0.5rem;
+            background: var(--bg-hover);
+            padding: 0.15rem 0.8rem;
+            border-radius: 1rem;
+            transition: background 0.3s ease, color 0.3s ease;
+        }
+        .flashcard .back .en-again {
+            font-size: 1rem;
+            color: var(--text-muted);
+            margin-top: 1rem;
+            border-top: 1px solid var(--border-color);
+            padding-top: 0.75rem;
+            width: 80%;
+            transition: color 0.3s ease, border-color 0.3s ease;
+        }
+        .flashcard .card-number {
+            position: absolute;
+            top: 0.75rem;
+            right: 1rem;
+            font-size: 0.75rem;
+            color: var(--text-light);
+            font-weight: 500;
+            background: var(--bg-hover);
+            padding: 0.1rem 0.6rem;
+            border-radius: 1rem;
+            transition: background 0.3s ease, color 0.3s ease;
+        }
+        .flashcard .flip-hint {
+            position: absolute;
+            bottom: 0.75rem;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.7rem;
+            color: var(--text-light);
+            background: var(--bg-hover);
+            padding: 0.1rem 0.8rem;
+            border-radius: 1rem;
+            border: 1px solid var(--border-color);
+            pointer-events: none;
+            transition: background 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+        }
+
+        .form-row {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.15rem;
+            padding: 0.55rem 0;
+            width: 100%;
+        }
+        .form-row + .form-row {
+            border-top: 1px dashed var(--border-color);
+        }
+        .form-row .label {
+            font-size: 0.72rem;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            color: var(--text-muted);
+            font-weight: 700;
+        }
+        .form-row .value {
+            font-size: 1.55rem;
+            font-weight: 700;
+            color: var(--accent-blue);
+            line-height: 1.2;
+            letter-spacing: 0.3px;
+        }
+        .form-row .value.past {
+            color: var(--accent-purple);
+        }
+
+        .flashcard .back .category-tag {
+            display: inline-block;
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            background: var(--bg-surface-alt);
+            padding: 0.15rem 0.7rem;
+            border-radius: 1rem;
+            margin-bottom: 0.6rem;
+            border: 1px solid var(--border-color);
+        }
+
+        .action-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.6rem;
+            justify-content: center;
+            margin: 1rem 0 0.5rem;
+            padding: 0.75rem;
+            background: var(--bg-surface);
+            border-radius: 1rem;
+            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow-sm);
+            transition: background 0.3s ease, border-color 0.3s ease;
+        }
+        .action-row button {
+            padding: 0.5rem 1.2rem;
+            border: none;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: background 0.15s, transform 0.1s, opacity 0.15s;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+        .action-row button:active { transform: scale(0.96); }
+
+        .nav-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            justify-content: center;
+            align-items: center;
+            margin-top: 0.25rem;
+        }
+        .nav-row button {
+            padding: 0.4rem 1.2rem;
+            border: 1px solid var(--border-color);
+            border-radius: 0.5rem;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: background 0.15s, border-color 0.15s, color 0.15s;
+            background: var(--bg-surface);
+            color: var(--text-primary);
+        }
+        .nav-row button:hover { background: var(--bg-hover); }
+        .nav-row .btn-primary {
+            background: var(--accent-blue);
+            color: white;
+            border-color: var(--accent-blue);
+        }
+        .nav-row .btn-primary:hover { background: var(--accent-blue-hover); border-color: var(--accent-blue-hover); }
+        .nav-row .stats-text {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            padding: 0 0.75rem;
+        }
+        .nav-row .stats-text strong { color: var(--text-primary); }
+
+        .progress-bar {
+            width: 100%;
+            max-width: 600px;
+            height: 4px;
+            background: var(--progress-bar-bg);
+            border-radius: 2px;
+            margin: 0.25rem auto 0.5rem;
+            overflow: hidden;
+            transition: background 0.3s ease;
+        }
+        .progress-bar .fill {
+            height: 100%;
+            background: var(--progress-fill);
+            border-radius: 2px;
+            transition: width 0.3s ease;
+        }
+
+        .metrics-panel {
+            background: var(--bg-surface);
+            border-radius: 0.75rem;
+            border: 1px solid var(--border-color);
+            padding: 1rem 1.5rem;
+            margin-top: 1rem;
+            display: none;
+            box-shadow: var(--shadow-sm);
+            transition: background 0.3s ease, border-color 0.3s ease;
+        }
+        .metrics-panel.open { display: block; }
+        .metrics-panel h3 {
+            margin: 0 0 0.75rem 0;
+            font-size: 1.1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            color: var(--text-primary);
+        }
+        .metrics-panel h3 .btn-group-small {
+            display: flex;
+            gap: 0.4rem;
+            flex-wrap: wrap;
+        }
+        .metrics-panel h3 .btn-group-small button {
+            font-size: 0.75rem;
+            padding: 0.25rem 0.8rem;
+            border: 1px solid var(--border-color);
+            border-radius: 0.3rem;
+            cursor: pointer;
+            font-weight: 600;
+            transition: background 0.15s, border-color 0.15s, color 0.15s;
+            background: var(--bg-hover);
+            color: var(--text-primary);
+        }
+        .metrics-panel h3 .btn-group-small .btn-csv { background: var(--accent-green); color: white; border-color: var(--accent-green); }
+        .metrics-panel h3 .btn-group-small .btn-csv:hover { background: var(--accent-green-hover); }
+        .metrics-panel h3 .btn-group-small .btn-txt { background: var(--accent-blue); color: white; border-color: var(--accent-blue); }
+        .metrics-panel h3 .btn-group-small .btn-txt:hover { background: var(--accent-blue-hover); }
+        .metrics-panel h3 .btn-group-small .btn-print { background: var(--accent-purple); color: white; border-color: var(--accent-purple); }
+        .metrics-panel h3 .btn-group-small .btn-print:hover { background: var(--accent-purple-hover); }
+        .metrics-panel h3 .btn-group-small .btn-close { background: var(--accent-gray); color: var(--text-primary); border-color: var(--border-color); }
+        .metrics-panel h3 .btn-group-small .btn-close:hover { background: var(--accent-gray-hover); }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+        }
+        .metric-card {
+            background: var(--bg-surface-alt);
+            padding: 0.6rem 1rem;
+            border-radius: 0.5rem;
+            border: 1px solid var(--border-color);
+            text-align: center;
+            transition: background 0.3s ease, border-color 0.3s ease;
+        }
+        .metric-card .num {
+            font-size: 1.8rem;
+            font-weight: 700;
+        }
+        .metric-card .label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .metric-card.green .num { color: var(--accent-green); }
+        .metric-card.red .num { color: var(--accent-red); }
+        .metric-card.blue .num { color: var(--accent-blue); }
+        .metric-card.orange .num { color: var(--accent-yellow); }
+
+        .weak-list {
+            max-height: 200px;
+            overflow-y: auto;
+            border-top: 1px solid var(--border-color);
+            padding-top: 0.75rem;
+            transition: border-color 0.3s ease;
+        }
+        .weak-list .weak-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.4rem 0.6rem;
+            border-bottom: 1px solid var(--weak-item-border);
+            font-size: 0.9rem;
+            transition: border-color 0.3s ease;
+        }
+        .weak-list .weak-item:last-child { border-bottom: none; }
+        .weak-list .weak-item .en { color: var(--text-primary); }
+        .weak-list .weak-item .form { color: var(--accent-blue); font-weight: 600; }
+        .weak-list .weak-item .form.past { color: var(--accent-purple); }
+        .weak-list .weak-item .remove-btn {
+            background: none;
+            border: none;
+            color: var(--text-light);
+            cursor: pointer;
+            font-size: 0.8rem;
+            padding: 0.2rem 0.5rem;
+            border-radius: 0.25rem;
+            transition: background 0.15s, color 0.15s;
+        }
+        .weak-list .weak-item .remove-btn:hover {
+            background: var(--accent-red);
+            color: white;
+        }
+        .empty-msg {
+            text-align: center;
+            color: var(--text-muted);
+            padding: 1rem;
+            font-style: italic;
+        }
+
+        @media print {
+            body { background: white; padding: 1rem; color: #0f172a; }
+            .flashcard, .action-row, .nav-row, .top-bar, .progress-bar, .footer-note,
+            .theme-toggle, .tab-selector, .level-switcher { display: none !important; }
+            .metrics-panel { display: block !important; border: none; padding: 0; box-shadow: none; }
+            .metrics-panel .btn-group-small { display: none; }
+            .weak-list { max-height: none; }
+            .weak-list .weak-item .remove-btn { display: none; }
+            .metric-card { background: #f8fafc; border: 1px solid #e2e8f0; }
+            .metric-card .num { color: #0f172a; }
+            .metric-card.green .num { color: #16a34a; }
+            .metric-card.red .num { color: #dc2626; }
+            .metric-card.blue .num { color: #2563eb; }
+            .metric-card.orange .num { color: #d97706; }
+            .weak-list .weak-item { border-bottom: 1px solid #e2e8f0; }
+            .weak-list .weak-item .en { color: #0f172a; }
+            .weak-list .weak-item .form { color: #1e40af; }
+            .empty-msg { color: #94a3b8; }
+        }
+
+        .footer-note {
+            margin-top: 1.5rem;
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.8rem;
+            border-top: 1px solid var(--border-color);
+            padding-top: 1rem;
+            transition: color 0.3s ease, border-color 0.3s ease;
+        }
+        .footer-note kbd {
+            background: var(--bg-hover);
+            padding: 0.1rem 0.5rem;
+            border-radius: 0.2rem;
+            font-family: monospace;
+            border: 1px solid var(--border-color);
+            transition: background 0.3s ease, border-color 0.3s ease;
+        }
+
+        .hidden { display: none !important; }
+
+        /* Update banner (for service worker) */
+        .update-banner {
+            position: fixed;
+            bottom: 1rem;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--accent-blue);
+            color: white;
+            padding: 0.75rem 1.25rem;
+            border-radius: 0.75rem;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+            display: none;
+            align-items: center;
+            gap: 0.75rem;
+            font-size: 0.9rem;
+            z-index: 9999;
+            max-width: 90%;
+        }
+        .update-banner.show { display: flex; }
+        .update-banner button {
+            background: white;
+            color: var(--accent-blue);
+            border: none;
+            padding: 0.35rem 0.9rem;
+            border-radius: 0.4rem;
+            font-weight: 700;
+            cursor: pointer;
+            font-size: 0.85rem;
+        }
+
+        @media (max-width: 600px) {
+            body { padding: 1rem; padding-top: max(1rem, env(safe-area-inset-top)); }
+            .flashcard { min-height: 240px; padding: 1.5rem; }
+            .flashcard .front .en { font-size: 1.4rem; }
+            .flashcard .back .form { font-size: 1.5rem; }
+            .form-row .value { font-size: 1.3rem; }
+            .top-bar { flex-direction: column; align-items: stretch; }
+            .top-bar .filter-area { flex-wrap: wrap; }
+            .top-bar .filter-area input { width: 100%; }
+            .action-row { gap: 0.4rem; }
+            .action-row button { padding: 0.4rem 0.8rem; font-size: 0.8rem; }
+            .metrics-grid { grid-template-columns: 1fr 1fr; }
+            .metrics-panel h3 { flex-direction: column; align-items: stretch; }
+            .metrics-panel h3 .btn-group-small { justify-content: center; }
+            .theme-toggle { margin-left: 0; }
+            .tab-selector button { min-width: 70px; font-size: 0.7rem; padding: 0.4rem 0.5rem; }
+            .level-switcher button { font-size: 0.85rem; padding: 0.5rem 0.75rem; }
+        }
+    </style>
+</head>
+<body>
+
+<h1>
+    🇩🇪 German Flashcards
+    <span style="font-size:0.8rem;font-weight:400;color:var(--text-muted);" id="modeLabel">A1 · Verbs</span>
+    <span class="theme-toggle">
+        <span class="icon">☀️</span>
+        <span class="switch" id="themeSwitch" role="button" tabindex="0" aria-label="Toggle dark mode">
+            <span class="slider"></span>
+        </span>
+        <span class="icon">🌙</span>
+    </span>
+</h1>
+<div class="subhead">
+    <strong id="subheadText">Present &amp; Past Tense Ib — click to flip</strong>
+</div>
+
+<!-- Level Switcher -->
+<div class="level-switcher" id="levelSwitcher">
+    <button class="active" data-level="a1">🇩🇪 A1 <span class="badge">Beginner</span></button>
+    <button data-level="a2">🇩🇪 A2 <span class="badge">Elementary</span></button>
+</div>
+
+<!-- Tab Selector -->
+<div class="tab-selector" id="tabSelector">
+    <!-- Populated by JS -->
+</div>
+
+<div class="top-bar" id="flashcardTopBar">
+    <div class="filter-area">
+        <input type="text" id="filterInput" placeholder="Filter English or German..." />
+        <span class="count-badge" id="countDisplay">0 items</span>
+    </div>
+    <div class="btn-group" id="filterBtnGroup">
+        <button class="active" id="allModeBtn">📚 All</button>
+        <button id="weakModeBtn">🔄 Weak</button>
+    </div>
+</div>
+
+<div class="card-container" id="flashcardContainer">
+    <div class="flashcard" id="flashcard">
+        <div class="front">
+            <div class="en" id="frontEn">Loading...</div>
+            <div class="hint" id="frontHint">click to reveal</div>
+        </div>
+        <div class="back">
+            <div id="backCategory" class="category-tag hidden"></div>
+            <div id="backFormContainer"><div class="form" id="backForm">—</div></div>
+            <div class="person-label" id="backLabel"></div>
+            <div class="en-again" id="backEn">—</div>
+        </div>
+        <span class="card-number" id="cardNumber">0 / 0</span>
+        <span class="flip-hint">↻ tap to flip</span>
+    </div>
+</div>
+
+<div class="progress-bar" id="progressBar">
+    <div class="fill" id="progressFill"></div>
+</div>
+
+<div class="action-row" id="actionRow">
+    <button class="btn-success" id="correctBtn" style="background:var(--accent-green);color:white;">✅ Got it Right</button>
+    <button class="btn-danger" id="wrongBtn" style="background:var(--accent-red);color:white;">❌ Don't Know</button>
+    <button class="btn-warning" id="resetCardBtn" style="background:var(--accent-yellow);color:white;">↺ Reset</button>
+    <button class="btn-gray" id="toggleMetricsBtn" style="background:var(--accent-gray);color:var(--text-primary);">📊 Metrics</button>
+</div>
+
+<div class="nav-row" id="navRow">
+    <button id="prevBtn">◀ Prev</button>
+    <button class="btn-primary" id="nextBtn">Next ▶</button>
+    <button id="shuffleBtn">🔀 Shuffle</button>
+    <span class="stats-text">
+        <strong id="currentIndexDisplay">1</strong> / <span id="totalCountDisplay">0</span>
+    </span>
+</div>
+
+<div class="metrics-panel" id="metricsPanel">
+    <h3>
+        📊 Your Progress — <span id="metricsLevelLabel">A1</span>
+        <span class="btn-group-small">
+            <button class="btn-csv" id="downloadCsvBtn">📥 CSV</button>
+            <button class="btn-txt" id="downloadTxtBtn">📄 TXT</button>
+            <button class="btn-print" id="printBtn">🖨️ Print</button>
+            <button class="btn-close" id="closeMetricsBtn">✕ Close</button>
+        </span>
+    </h3>
+    <div class="metrics-grid">
+        <div class="metric-card green">
+            <div class="num" id="totalRight">0</div>
+            <div class="label">✅ Got Right</div>
+        </div>
+        <div class="metric-card red">
+            <div class="num" id="totalWrong">0</div>
+            <div class="label">❌ Don't Know</div>
+        </div>
+        <div class="metric-card blue">
+            <div class="num" id="totalSeen">0</div>
+            <div class="label">👀 Seen</div>
+        </div>
+        <div class="metric-card orange">
+            <div class="num" id="accuracyDisplay">0%</div>
+            <div class="label">🎯 Accuracy</div>
+        </div>
+        <div class="metric-card" style="grid-column: span 2;">
+            <div class="num" id="weakCountDisplay">0</div>
+            <div class="label">📝 Words in "Don't Know" List</div>
+        </div>
+    </div>
+    <div>
+        <h4 style="margin:0.5rem 0;font-size:0.95rem;color:var(--text-primary);">📝 Words You Marked "Don't Know"</h4>
+        <div class="weak-list" id="weakList">
+            <div class="empty-msg">No words marked yet. Keep practicing!</div>
+        </div>
+    </div>
+</div>
+
+<div class="footer-note">
+    💡 <kbd>←</kbd> <kbd>→</kbd> navigate &nbsp;·&nbsp; <kbd>Space</kbd> flip &nbsp;·&nbsp; <kbd>R</kbd> right &nbsp;·&nbsp; <kbd>W</kbd> wrong
+</div>
+
+<!-- Update banner -->
+<div class="update-banner" id="updateBanner">
+    <span>✨ New version available</span>
+    <button id="reloadBtn">Reload</button>
+</div>
+
+<script>
+// ============================================================
+// DATA — will be defined below
+// ============================================================
+// A1 data
+const A1_DATA = {
+    verbs: [/* ... A1 verbs ... */],
+    trennbar: [/* ... */],
+    reflexive: [/* ... */],
+    adj: [/* ... */],
+    nouns: [/* ... */],
+    others: [/* ... */]
+};
+
+// A2 data
+const A2_DATA = {
+    verbs: [/* ... A2 verbs ... */],
+    reflexive: [/* ... */],
+    trennbar: [/* ... */],
+    adj: [/* ... */],
+    nouns: [/* ... */],
+    imperative: [/* ... */]
+};
+</script>
+
+<!-- Then the full data + logic below -->
+<script>
+// ============================================================
+// A1 DATA
+// ============================================================
+const A1_VERBS = [
+    { en: "decide", form: "entscheiden", past: "hat entschieden" },
+    { en: "answer / reply", form: "antworten", past: "hat geantwortet" },
+    { en: "work", form: "arbeiten", past: "hat gearbeitet" },
+    { en: "bathe", form: "baden", past: "hat gebadet" },
+    { en: "mean (es)", form: "bedeuten", past: "hat bedeutet" },
+    { en: "begin", form: "beginnen", past: "hat begonnen" },
+    { en: "get / receive", form: "bekommen", past: "hat bekommen" },
+    { en: "use", form: "benutzen", past: "hat benutzt" },
+    { en: "order", form: "bestellen", past: "hat bestellt" },
+    { en: "visit (person)", form: "besuchen", past: "hat besucht" },
+    { en: "visit (apartment) / inspect", form: "besichtigen", past: "hat besichtigt" },
+    { en: "pay", form: "bezahlen", past: "hat bezahlt" },
+    { en: "request", form: "bitten", past: "hat gebeten" },
+    { en: "stay / remain", form: "bleiben", past: "ist geblieben" },
+    { en: "need", form: "brauchen", past: "hat gebraucht" },
+    { en: "bring", form: "bringen", past: "hat gebracht" },
+    { en: "spell", form: "buchstabieren", past: "hat buchstabiert" },
+    { en: "thank", form: "danken", past: "hat gedankt" },
+    { en: "print", form: "drucken", past: "hat gedruckt" },
+    { en: "press", form: "drücken", past: "hat gedrückt" },
+    { en: "shower", form: "duschen", past: "hat geduscht" },
+    { en: "end / end up", form: "enden", past: "hat geendet" },
+    { en: "excuse / apologize", form: "entschuldigen", past: "hat entschuldigt" },
+    { en: "explain", form: "erklären", past: "hat erklärt" },
+    { en: "allow", form: "erlauben", past: "hat erlaubt" },
+    { en: "tell in detail", form: "erzählen", past: "hat erzählt" },
+    { en: "missing / absence (es)", form: "fehlen", past: "hat gefehlt" },
+    { en: "find", form: "finden", past: "hat gefunden" },
+    { en: "fly", form: "fliegen", past: "ist geflogen" },
+    { en: "ask", form: "fragen", past: "hat gefragt" },
+    { en: "have breakfast", form: "frühstücken", past: "hat gefrühstückt" },
+    { en: "fall", form: "fallen", past: "ist gefallen" },
+    { en: "to be liked (es)", form: "gefallen", past: "hat gefallen" },
+    { en: "go", form: "gehen", past: "ist gegangen" },
+    { en: "belong", form: "gehören", past: "hat gehört" },
+    { en: "win", form: "gewinnen", past: "hat gewonnen" },
+    { en: "believe", form: "glauben", past: "hat geglaubt" },
+    { en: "congratulate", form: "gratulieren", past: "hat gratuliert" },
+    { en: "barbecue", form: "grillen", past: "hat gegrillt" },
+    { en: "marry", form: "heiraten", past: "hat geheiratet" },
+    { en: "to be called", form: "heißen", past: "hat geheißen" },
+    { en: "get / collect", form: "holen", past: "hat geholt" },
+    { en: "hear", form: "hören", past: "hat gehört" },
+    { en: "buy", form: "kaufen", past: "hat gekauft" },
+    { en: "know", form: "kennen", past: "hat gekannt" },
+    { en: "cook", form: "kochen", past: "hat gekocht" },
+    { en: "think", form: "denken", past: "hat gedacht" },
+    { en: "come", form: "kommen", past: "ist gekommen" },
+    { en: "cost", form: "kosten", past: "hat gekostet" },
+    { en: "get (colloquial)", form: "kriegen", past: "hat gekriegt" },
+    { en: "laugh", form: "lachen", past: "hat gelacht" },
+    { en: "live", form: "leben", past: "hat gelebt" },
+    { en: "lay", form: "legen", past: "hat gelegt" },
+    { en: "tell a lie", form: "lügen", past: "hat gelogen" },
+    { en: "learn", form: "lernen", past: "hat gelernt" },
+    { en: "love", form: "lieben", past: "hat geliebt" },
+    { en: "lie", form: "liegen", past: "hat gelegen" },
+    { en: "make / do", form: "machen", past: "hat gemacht" },
+    { en: "do (physical)", form: "tun", past: "hat getan" },
+    { en: "rent", form: "mieten", past: "hat gemietet" },
+    { en: "open", form: "öffnen", past: "hat geöffnet" },
+    { en: "smoke", form: "rauchen", past: "hat geraucht" },
+    { en: "rain (es)", form: "regnen", past: "hat geregnet" },
+    { en: "travel", form: "reisen", past: "ist gereist" },
+    { en: "repair", form: "reparieren", past: "hat repariert" },
+    { en: "smell", form: "riechen", past: "hat gerochen" },
+    { en: "say", form: "sagen", past: "hat gesagt" },
+    { en: "seem", form: "scheinen", past: "hat geschienen" },
+    { en: "send", form: "schicken", past: "hat geschickt" },
+    { en: "close", form: "schließen", past: "hat geschlossen" },
+    { en: "taste (es)", form: "schmecken", past: "hat geschmeckt" },
+    { en: "write", form: "schreiben", past: "hat geschrieben" },
+    { en: "swim", form: "schwimmen", past: "ist geschwommen" },
+    { en: "sit", form: "sitzen", past: "hat gesessen" },
+    { en: "play", form: "spielen", past: "hat gespielt" },
+    { en: "speak", form: "sprechen", past: "hat gesprochen" },
+    { en: "stand", form: "stehen", past: "hat gestanden" },
+    { en: "place / put", form: "stellen", past: "hat gestellt" },
+    { en: "study", form: "studieren", past: "hat studiert" },
+    { en: "search", form: "suchen", past: "hat gesucht" },
+    { en: "dance", form: "tanzen", past: "hat getanzt" },
+    { en: "talk on phone", form: "telefonieren", past: "hat telefoniert" },
+    { en: "drink", form: "trinken", past: "hat getrunken" },
+    { en: "stay overnight", form: "übernachten", past: "hat übernachtet" },
+    { en: "transfer (money)", form: "überweisen", past: "hat überwiesen" },
+    { en: "move out of apartment", form: "umziehen", past: "ist umgezogen" },
+    { en: "sign", form: "unterschreiben", past: "hat unterschrieben" },
+    { en: "earn", form: "verdienen", past: "hat verdient" },
+    { en: "sell", form: "verkaufen", past: "hat verkauft" },
+    { en: "rent out", form: "vermieten", past: "hat vermietet" },
+    { en: "understand", form: "verstehen", past: "hat verstanden" },
+    { en: "wait", form: "warten", past: "hat gewartet" },
+    { en: "wash", form: "waschen", past: "hat gewaschen" },
+    { en: "repeat", form: "wiederholen", past: "hat wiederholt" },
+    { en: "live / reside", form: "wohnen", past: "hat gewohnt" },
+    { en: "pay (a sum)", form: "zahlen", past: "hat gezahlt" },
+    { en: "there is / there are", form: "es gibt", past: "es hat gegeben" },
+    { en: "hurt", form: "weh tun", past: "hat wehgetan" },
+    { en: "celebrate", form: "feiern", past: "hat gefeiert" },
+    { en: "try", form: "versuchen", past: "hat versucht" },
+    { en: "look / watch", form: "gucken", past: "hat geguckt" },
+    { en: "give", form: "geben", past: "hat gegeben" },
+    { en: "hold", form: "halten", past: "hat gehalten" },
+    { en: "help", form: "helfen", past: "hat geholfen" },
+    { en: "run", form: "laufen", past: "ist gelaufen" },
+    { en: "read", form: "lesen", past: "hat gelesen" },
+    { en: "take", form: "nehmen", past: "hat genommen" },
+    { en: "drive", form: "fahren", past: "ist gefahren" },
+    { en: "sleep", form: "schlafen", past: "hat geschlafen" },
+    { en: "see", form: "sehen", past: "hat gesehen" },
+    { en: "recommend", form: "empfehlen", past: "hat empfohlen" },
+    { en: "eat", form: "essen", past: "hat gegessen" },
+    { en: "meet", form: "treffen", past: "hat getroffen" },
+    { en: "know (facts)", form: "wissen", past: "hat gewusst" },
+    { en: "become / will", form: "werden", past: "ist geworden" },
+    { en: "to be", form: "sein", past: "ist gewesen" },
+    { en: "have", form: "haben", past: "hat gehabt" },
+    { en: "can / be able to", form: "können", past: "hat gekonnt" },
+    { en: "must / have to", form: "müssen", past: "hat gemusst" },
+    { en: "want to", form: "wollen", past: "hat gewollt" },
+    { en: "should / ought to", form: "sollen", past: "hat gesollt" },
+    { en: "may / be allowed", form: "dürfen", past: "hat gedurft" },
+    { en: "like (to like)", form: "mögen", past: "hat gemocht" },
+    { en: "would like", form: "möchten", past: "hat gemocht" }
+];
+
+const A1_TRENNBAR = [
+    { en: "depart / drive off", form: "abfahren", past: "ist abgefahren" },
+    { en: "hand over / submit", form: "abgeben", past: "hat abgegeben" },
+    { en: "pick up", form: "abholen", past: "hat abgeholt" },
+    { en: "take off / depart (flight)", form: "abfliegen", past: "ist abgeflogen" },
+    { en: "offer", form: "anbieten", past: "hat angeboten" },
+    { en: "start / begin", form: "anfangen", past: "hat angefangen" },
+    { en: "share / inform / communicate", form: "mitteilen", past: "hat mitgeteilt" },
+    { en: "click", form: "anklicken", past: "hat angeklickt" },
+    { en: "arrive", form: "ankommen", past: "ist angekommen" },
+    { en: "tick / mark with cross", form: "ankreuzen", past: "hat angekreuzt" },
+    { en: "turn on", form: "anmachen", past: "hat angemacht" },
+    { en: "log on / sign in / enroll", form: "anmelden", past: "hat angemeldet" },
+    { en: "call (phone)", form: "anrufen", past: "hat angerufen" },
+    { en: "dress / put on clothes", form: "anziehen", past: "hat angezogen" },
+    { en: "accept", form: "annehmen", past: "hat angenommen" },
+    { en: "stop / cease", form: "aufhören", past: "hat aufgehört" },
+    { en: "stand up / get up", form: "aufstehen", past: "ist aufgestanden" },
+    { en: "fill out", form: "ausfüllen", past: "hat ausgefüllt" },
+    { en: "turn off / make out", form: "ausmachen", past: "hat ausgemacht" },
+    { en: "look / appearance", form: "aussehen", past: "hat ausgesehen" },
+    { en: "get off / get out", form: "aussteigen", past: "ist ausgestiegen" },
+    { en: "undress / move out", form: "ausziehen", past: "ist ausgezogen" },
+    { en: "shop / go shopping", form: "einkaufen", past: "hat eingekauft" },
+    { en: "invite", form: "einladen", past: "hat eingeladen" },
+    { en: "enter / get on", form: "einsteigen", past: "ist eingestiegen" },
+    { en: "watch TV", form: "fernsehen", past: "hat ferngesehen" },
+    { en: "get to know", form: "kennenlernen", past: "hat kennengelernt" },
+    { en: "bring along", form: "mitbringen", past: "hat mitgebracht" },
+    { en: "come along", form: "mitkommen", past: "ist mitgekommen" },
+    { en: "join in / participate", form: "mitmachen", past: "hat mitgemacht" },
+    { en: "participate / take part", form: "teilnehmen", past: "hat teilgenommen" },
+    { en: "take place", form: "stattfinden", past: "hat stattgefunden" },
+    { en: "ride a bicycle", form: "Fahrrad fahren", past: "hat Fahrrad gefahren" },
+    { en: "take along", form: "mitnehmen", past: "hat mitgenommen" },
+    { en: "listen (to)", form: "zuhören", past: "hat zugehört" },
+    { en: "go for a walk", form: "spazieren gehen", past: "ist spazieren gegangen" },
+    { en: "introduce", form: "vorstellen", past: "hat vorgestellt" },
+    { en: "cancel", form: "absagen", past: "hat abgesagt" },
+    { en: "send off", form: "abschicken", past: "hat abgeschickt" },
+    { en: "put down", form: "abstellen", past: "hat abgestellt" },
+    { en: "stop (something moving)", form: "anhalten", past: "hat angehalten" },
+    { en: "switch on", form: "anschalten", past: "hat angeschaltet" },
+    { en: "look at / watch", form: "anschauen", past: "hat angeschaut" },
+    { en: "hang up", form: "aufhängen", past: "hat aufgehängt" },
+    { en: "open (up)", form: "aufmachen", past: "hat aufgemacht" },
+    { en: "tidy up", form: "aufräumen", past: "hat aufgeräumt" },
+    { en: "write down", form: "aufschreiben", past: "hat aufgeschrieben" },
+    { en: "go out", form: "ausgehen", past: "ist ausgegangen" },
+    { en: "unpack", form: "auspacken", past: "hat ausgepackt" },
+    { en: "switch off", form: "ausschalten", past: "hat ausgeschaltet" },
+    { en: "carry out", form: "durchführen", past: "hat durchgeführt" },
+    { en: "pack (in)", form: "einpacken", past: "hat eingepackt" },
+    { en: "turn on / switch on", form: "einschalten", past: "hat eingeschaltet" },
+    { en: "move in", form: "einziehen", past: "ist eingezogen" },
+    { en: "finish (something)", form: "fertig machen", past: "hat fertig gemacht" },
+    { en: "bring out", form: "rausbringen", past: "hat rausgebracht" },
+    { en: "clean (something)", form: "sauber machen", past: "hat sauber gemacht" },
+    { en: "plan / intend", form: "vorhaben", past: "hat vorgehabt" },
+    { en: "drive away", form: "wegfahren", past: "ist weggefahren" },
+    { en: "close (up)", form: "zumachen", past: "hat zugemacht" },
+    { en: "give back", form: "zurückgeben", past: "hat zurückgegeben" }
+];
+
+const A1_REFLEXIVE = [
+    { en: "to get dressed", form: "sich anziehen", past: "hat sich angezogen" },
+    { en: "strip off / undress", form: "sich ausziehen", past: "hat sich ausgezogen" },
+    { en: "take a shower", form: "sich duschen", past: "hat sich geduscht" },
+    { en: "rejoice / look forward", form: "sich freuen", past: "hat sich gefreut" },
+    { en: "meet (each other)", form: "sich treffen", past: "hat sich getroffen" },
+    { en: "introduce oneself", form: "sich vorstellen", past: "hat sich vorgestellt" },
+    { en: "to wash oneself", form: "sich waschen", past: "hat sich gewaschen" },
+    { en: "take care of", form: "sich kümmern", past: "hat sich gekümmert" }
+];
+
+const A1_ADJ = [
+    { cat: "1. Descriptive Adjectives", en: "old", de: "alt" },
+    { cat: "1. Descriptive Adjectives", en: "wide", de: "breit" },
+    { cat: "1. Descriptive Adjectives", en: "big / tall", de: "groß" },
+    { cat: "1. Descriptive Adjectives", en: "high / tall", de: "hoch" },
+    { cat: "1. Descriptive Adjectives", en: "cheap", de: "billig" },
+    { cat: "1. Descriptive Adjectives", en: "bright / light", de: "hell" },
+    { cat: "1. Descriptive Adjectives", en: "small", de: "klein" },
+    { cat: "1. Descriptive Adjectives", en: "beautiful / nice", de: "schön" },
+    { cat: "1. Descriptive Adjectives", en: "expensive", de: "teuer" },
+    { cat: "2. Emotional States", en: "wonderful", de: "wunderbar" },
+    { cat: "2. Emotional States", en: "angry / evil", de: "böse" },
+    { cat: "2. Emotional States", en: "happy", de: "glücklich" },
+    { cat: "2. Emotional States", en: "funny", de: "lustig" },
+    { cat: "2. Emotional States", en: "tired", de: "müde" },
+    { cat: "2. Emotional States", en: "sad", de: "traurig" },
+    { cat: "2. Emotional States", en: "satisfied", de: "zufrieden" },
+    { cat: "3. Status / Conditions", en: "unemployed", de: "arbeitslos" },
+    { cat: "3. Status / Conditions", en: "known / famous", de: "bekannt" },
+    { cat: "3. Status / Conditions", en: "free / available", de: "frei" },
+    { cat: "3. Status / Conditions", en: "broken", de: "kaputt" },
+    { cat: "3. Status / Conditions", en: "open", de: "offen" },
+    { cat: "3. Status / Conditions", en: "opened", de: "geöffnet" },
+    { cat: "3. Status / Conditions", en: "dead", de: "tot" },
+    { cat: "3. Status / Conditions", en: "born", de: "geboren" },
+    { cat: "3. Status / Conditions", en: "busy", de: "beschäftigt" },
+    { cat: "3. Status / Conditions", en: "occupied / busy", de: "besetzt" },
+    { cat: "3. Status / Conditions", en: "ready / finished", de: "fertig" },
+    { cat: "3. Status / Conditions", en: "sick", de: "krank" },
+    { cat: "3. Status / Conditions", en: "closed", de: "geschlossen" },
+    { cat: "3. Status / Conditions", en: "died / passed away", de: "gestorben" },
+    { cat: "3. Status / Conditions", en: "married", de: "verheiratet" },
+    { cat: "3. Status / Conditions", en: "single (marital status)", de: "ledig" },
+    { cat: "4. Qualitative / Superlative", en: "best", de: "best" },
+    { cat: "4. Qualitative / Superlative", en: "medium / average", de: "mittel" },
+    { cat: "4. Qualitative / Superlative", en: "necessary", de: "nötig" },
+    { cat: "4. Qualitative / Superlative", en: "favourable / affordable", de: "günstig" },
+    { cat: "4. Qualitative / Superlative", en: "possible", de: "möglich" },
+    { cat: "4. Qualitative / Superlative", en: "important", de: "wichtig" },
+    { cat: "5. Time Related", en: "last", de: "letzt" },
+    { cat: "5. Time Related", en: "next", de: "nächste" },
+    { cat: "6. Preferences", en: "favourite", de: "Lieblings-" },
+    { cat: "7. Social / Cultural", en: "international", de: "international" },
+    { cat: "7. Social / Cultural", en: "cultural", de: "kulturell" },
+    { cat: "7. Social / Cultural", en: "foreign (from abroad)", de: "ausländisch" },
+    { cat: "7. Social / Cultural", en: "foreign / strange", de: "fremd" },
+    { cat: "8. Actions / Behaviours", en: "punctual", de: "pünktlich" },
+    { cat: "8. Actions / Behaviours", en: "urgent / in a hurry", de: "eilig" },
+    { cat: "8. Actions / Behaviours", en: "independent", de: "selbstständig" },
+    { cat: "9. Negative Traits / States", en: "bitter", de: "bitter" },
+    { cat: "9. Negative Traits / States", en: "wrong / false", de: "falsch" },
+    { cat: "9. Negative Traits / States", en: "forbidden", de: "verboten" },
+    { cat: "10. Positive Traits / States", en: "heartfelt / cordial", de: "herzlich" },
+    { cat: "10. Positive Traits / States", en: "welcome", de: "willkommen" },
+    { cat: "10. Positive Traits / States", en: "delicious", de: "lecker" },
+    { cat: "11. Gender", en: "male / masculine", de: "männlich" },
+    { cat: "11. Gender", en: "female / feminine", de: "weiblich" },
+    { cat: "12. Miscellaneous", en: "cash", de: "bar" },
+    { cat: "12. Miscellaneous", en: "young", de: "jung" },
+    { cat: "12. Miscellaneous", en: "new", de: "neu" },
+    { cat: "12. Miscellaneous", en: "valid", de: "gültig" },
+    { cat: "Adverbs: Time", en: "approximately", de: "circa" },
+    { cat: "Adverbs: Time", en: "yesterday", de: "gestern" },
+    { cat: "Adverbs: Time", en: "long (for a long time)", de: "lange" },
+    { cat: "Adverbs: Time", en: "later", de: "später" },
+    { cat: "Adverbs: Time", en: "most preferably / favourite", de: "am liebsten" },
+    { cat: "Adverbs: Time", en: "soon", de: "bald" },
+    { cat: "Adverbs: Time", en: "back then / at that time", de: "damals" },
+    { cat: "Adverbs: Time", en: "earlier / in the past", de: "früher" },
+    { cat: "Adverbs: Time", en: "just now / currently", de: "gerade" },
+    { cat: "Adverbs: Time", en: "today", de: "heute" },
+    { cat: "Adverbs: Time", en: "now", de: "jetzt" },
+    { cat: "Adverbs: Time", en: "currently", de: "zurzeit" },
+    { cat: "Adverbs: Time", en: "late", de: "spät" },
+    { cat: "Adverbs: Time", en: "early", de: "früh" },
+    { cat: "Adverbs: Time", en: "immediately / same", de: "gleich" },
+    { cat: "Adverbs: Frequency", en: "more", de: "mehr" },
+    { cat: "Adverbs: Frequency", en: "mostly / usually", de: "meist" },
+    { cat: "Adverbs: Frequency", en: "never", de: "nie" },
+    { cat: "Adverbs: Frequency", en: "often", de: "oft" },
+    { cat: "Adverbs: Frequency", en: "always", de: "immer" },
+    { cat: "Adverbs: Frequency", en: "still / yet", de: "noch" },
+    { cat: "Adverbs: Frequency", en: "once again / again", de: "noch einmal" },
+    { cat: "Adverbs: Preference/Opinion", en: "unfortunately", de: "leider" },
+    { cat: "Adverbs: Preference/Opinion", en: "rather / preferably", de: "lieber" },
+    { cat: "Adverbs: Preference/Opinion", en: "very", de: "sehr" },
+    { cat: "Adverbs: Preference/Opinion", en: "maybe / perhaps", de: "vielleicht" },
+    { cat: "Adverbs: Direction", en: "below / downstairs", de: "unten" },
+    { cat: "Adverbs: Direction", en: "away", de: "weg" },
+    { cat: "Adverbs: Direction", en: "further / continue", de: "weiter" },
+    { cat: "Adverbs: Direction", en: "next to it / beside it", de: "daneben" },
+    { cat: "Adverbs: Direction", en: "outside", de: "draußen" },
+    { cat: "Adverbs: Direction", en: "straight ahead", de: "geradeaus" },
+    { cat: "Adverbs: Direction", en: "at the back / behind", de: "hinten" },
+    { cat: "Adverbs: Direction", en: "left (direction)", de: "links" },
+    { cat: "Adverbs: Direction", en: "above / upstairs", de: "oben" },
+    { cat: "Adverbs: Direction", en: "right (direction)", de: "rechts" },
+    { cat: "Adverbs: Direction", en: "back / behind", de: "zurück" },
+    { cat: "Adverbs: Direction", en: "together", de: "zusammen" },
+    { cat: "Adverbs: Politeness", en: "please", de: "bitte" },
+    { cat: "Adverbs: Politeness", en: "gladly / with pleasure", de: "gerne" },
+    { cat: "Adverbs: Negation", en: "not", de: "nicht" },
+    { cat: "Adverbs: Emphasis", en: "so / like this", de: "so" },
+    { cat: "Adverbs: Emphasis", en: "very", de: "sehr" },
+    { cat: "Adverbs: Emphasis", en: "otherwise", de: "sonst" },
+    { cat: "Adverbs: Immediate", en: "immediately", de: "sofort" },
+    { cat: "Adverbs: Miscellaneous", en: "once / one time", de: "einmal" },
+    { cat: "Adverbs: Miscellaneous", en: "here", de: "hier" },
+    { cat: "Adverbs: Miscellaneous", en: "there", de: "dort" },
+    { cat: "Adverbs: Miscellaneous", en: "also / too", de: "auch" },
+    { cat: "Adverbs: Miscellaneous", en: "only", de: "nur" },
+    { cat: "Adverbs: Miscellaneous", en: "already", de: "schon" },
+    { cat: "Adj/Adverbs: Feelings", en: "good", de: "gut" },
+    { cat: "Adj/Adverbs: Feelings", en: "dear", de: "liebe" },
+    { cat: "Adj/Adverbs: Feelings", en: "bad", de: "schlecht" },
+    { cat: "Adj/Adverbs: Objects", en: "alone", de: "allein" },
+    { cat: "Adj/Adverbs: Objects", en: "automatic", de: "automatisch" },
+    { cat: "Adj/Adverbs: Objects", en: "better", de: "besser" },
+    { cat: "Adj/Adverbs: Objects", en: "clear", de: "klar" },
+    { cat: "Adj/Adverbs: Objects", en: "loud", de: "laut" },
+    { cat: "Adj/Adverbs: Objects", en: "correct", de: "richtig" },
+    { cat: "Adj/Adverbs: Objects", en: "far / wide", de: "weit" },
+    { cat: "Adj/Adverbs: Objects", en: "simple", de: "einfach" },
+    { cat: "Adj/Adverbs: Objects", en: "short", de: "kurz" },
+    { cat: "Adj/Adverbs: Objects", en: "slow", de: "langsam" },
+    { cat: "Adj/Adverbs: Objects", en: "easy", de: "leicht" },
+    { cat: "Adj/Adverbs: Objects", en: "quiet", de: "leise" },
+    { cat: "Adj/Adverbs: Objects", en: "quiet / calm", de: "ruhig" },
+    { cat: "Adj/Adverbs: Objects", en: "heavy / difficult", de: "schwer" },
+    { cat: "Adj/Adverbs: Quantity", en: "much / a lot", de: "viel" },
+    { cat: "Adj/Adverbs: Quantity", en: "little / few", de: "wenig" },
+    { cat: "Adj/Adverbs: Others", en: "all / everyone", de: "alle" },
+    { cat: "Adj/Adverbs: Others", en: "other / others", de: "andere" },
+    { cat: "Adverbs: Manner", en: "loudly", de: "laut" },
+    { cat: "Adverbs: Manner", en: "lightly", de: "leicht" },
+    { cat: "Adverbs: Manner", en: "correctly", de: "richtig" },
+    { cat: "Adverbs: Manner", en: "slowly", de: "langsam" },
+    { cat: "Adverbs: Manner", en: "quietly", de: "leise" },
+    { cat: "Adverbs: Manner", en: "calmly", de: "ruhig" },
+    { cat: "Adverbs: Manner", en: "quickly", de: "schnell" },
+    { cat: "Miscellaneous Words", en: "so / therefore", de: "also" },
+    { cat: "Miscellaneous Words", en: "a little / a bit", de: "bisschen" },
+    { cat: "Miscellaneous Words", en: "the", de: "das" },
+    { cat: "Miscellaneous Words", en: "the", de: "der" },
+    { cat: "Miscellaneous Words", en: "the", de: "die" },
+    { cat: "Miscellaneous Words", en: "something / somewhat", de: "etwas" },
+    { cat: "Miscellaneous Words", en: "how / like", de: "wie" },
+    { cat: "Miscellaneous Words", en: "everything", de: "alles" },
+    { cat: "Miscellaneous Words", en: "thank you", de: "danke" },
+    { cat: "Miscellaneous Words", en: "hello", de: "hallo" },
+    { cat: "Miscellaneous Words", en: "yes", de: "ja" },
+    { cat: "Miscellaneous Words", en: "no", de: "nein" },
+    { cat: "Miscellaneous Words", en: "ready / done", de: "fertig" },
+    { cat: "Miscellaneous Words", en: "nothing", de: "nichts" },
+    { cat: "Miscellaneous Words", en: "bye", de: "tschüss" }
+];
+
+// (A1 nouns and others data — using the same as previous version, abbreviated here for brevity,
+//  but in the actual file you'd paste the full lists)
+const A1_NOUNS = [
+    { article: "der", en: "sender", de: "der Absender" },
+    { article: "der", en: "brother", de: "der Bruder" },
+    { article: "der", en: "boss", de: "der Chef" },
+    { article: "der", en: "driver", de: "der Fahrer" },
+    { article: "der", en: "friend", de: "der Freund" },
+    { article: "der", en: "guest", de: "der Gast" },
+    { article: "der", en: "grandfather", de: "der Großvater" },
+    { article: "der", en: "househusband", de: "der Hausmann" },
+    { article: "der", en: "colleague", de: "der Kollege" },
+    { article: "der", en: "man", de: "der Mann" },
+    { article: "der", en: "grandpa", de: "der Opa" },
+    { article: "der", en: "university student", de: "der Student" },
+    { article: "der", en: "father", de: "der Vater" },
+    { article: "der", en: "doctor", de: "der Arzt" },
+    { article: "der", en: "official", de: "der Beamte" },
+    { article: "der", en: "occupation", de: "der Beruf" },
+    { article: "der", en: "husband", de: "der Ehemann" },
+    { article: "der", en: "grownup / adult", de: "der Erwachsene" },
+    { article: "der", en: "master / Mr.", de: "der Herr" },
+    { article: "der", en: "youth", de: "der Jugendliche" },
+    { article: "der", en: "boy", de: "der Junge" },
+    { article: "der", en: "client / customer", de: "der Kunde" },
+    { article: "der", en: "teacher", de: "der Lehrer" },
+    { article: "der", en: "human", de: "der Mensch" },
+    { article: "der", en: "school student", de: "der Schüler" },
+    { article: "der", en: "seller / salesman", de: "der Verkäufer" },
+    { article: "der", en: "landlord", de: "der Vermieter" },
+    { article: "der", en: "relative", de: "der Verwandte" },
+    { article: "der", en: "vending machine", de: "der Automat" },
+    { article: "der", en: "computer", de: "der Computer" },
+    { article: "der", en: "shoe", de: "der Schuh" },
+    { article: "der", en: "answering machine", de: "der Anrufbeantworter" },
+    { article: "der", en: "elevator", de: "der Aufzug" },
+    { article: "der", en: "tree", de: "der Baum" },
+    { article: "der", en: "pencil", de: "der Bleistift" },
+    { article: "der", en: "letter", de: "der Brief" },
+    { article: "der", en: "letter / character", de: "der Buchstabe" },
+    { article: "der", en: "printer", de: "der Drucker" },
+    { article: "der", en: "tablespoon", de: "der Esslöffel" },
+    { article: "der", en: "TV (set)", de: "der Fernseher" },
+    { article: "der", en: "ballpoint pen", de: "der Kugelschreiber" },
+    { article: "der", en: "refrigerator", de: "der Kühlschrank" },
+    { article: "der", en: "counter / switch", de: "der Schalter" },
+    { article: "der", en: "key", de: "der Schlüssel" },
+    { article: "der", en: "cupboard / wardrobe", de: "der Schrank" },
+    { article: "der", en: "table", de: "der Tisch" },
+    { article: "der", en: "balcony", de: "der Balkon" },
+    { article: "der", en: "garden", de: "der Garten" },
+    { article: "der", en: "kindergarten", de: "der Kindergarten" },
+    { article: "der", en: "park", de: "der Park" },
+    { article: "der", en: "place / square", de: "der Platz" },
+    { article: "der", en: "room / space", de: "der Raum" },
+    { article: "der", en: "workplace", de: "der Arbeitsplatz" },
+    { article: "der", en: "railway station", de: "der Bahnhof" },
+    { article: "der", en: "platform", de: "der Bahnsteig" },
+    { article: "der", en: "airport", de: "der Flughafen" },
+    { article: "der", en: "birthplace", de: "der Geburtsort" },
+    { article: "der", en: "store / shop", de: "der Laden" },
+    { article: "der", en: "lake", de: "der See" },
+    { article: "der", en: "storey / floor", de: "der Stock" },
+    { article: "der", en: "club / union", de: "der Verein" },
+    { article: "der", en: "train", de: "der Zug" },
+    { article: "der", en: "apple", de: "der Apfel" },
+    { article: "der", en: "fish", de: "der Fisch" },
+    { article: "der", en: "coffee", de: "der Kaffee" },
+    { article: "der", en: "rice", de: "der Reis" },
+    { article: "der", en: "salad", de: "der Salat" },
+    { article: "der", en: "tea", de: "der Tee" },
+    { article: "der", en: "wine", de: "der Wein" },
+    { article: "der", en: "cake", de: "der Kuchen" },
+    { article: "der", en: "juice", de: "der Saft" },
+    { article: "der", en: "ham", de: "der Schinken" },
+    { article: "der", en: "appetite", de: "der Appetit" },
+    { article: "der", en: "thanks", de: "der Dank" },
+    { article: "der", en: "thirst", de: "der Durst" },
+    { article: "der", en: "film", de: "der Film" },
+    { article: "der", en: "soccer / football", de: "der Fußball" },
+    { article: "der", en: "hunger", de: "der Hunger" },
+    { article: "der", en: "job", de: "der Job" },
+    { article: "der", en: "moment", de: "der Moment" },
+    { article: "der", en: "plan", de: "der Plan" },
+    { article: "der", en: "price", de: "der Preis" },
+    { article: "der", en: "brochure", de: "der Prospekt" },
+    { article: "der", en: "rain", de: "der Regen" },
+    { article: "der", en: "sport", de: "der Sport" },
+    { article: "der", en: "test", de: "der Test" },
+    { article: "der", en: "text", de: "der Text" },
+    { article: "der", en: "start / beginning", de: "der Anfang" },
+    { article: "der", en: "call", de: "der Anruf" },
+    { article: "der", en: "connection", de: "der Anschluss" },
+    { article: "der", en: "excursion", de: "der Ausflug" },
+    { article: "der", en: "exit", de: "der Ausgang" },
+    { article: "der", en: "foreigner", de: "der Ausländer" },
+    { article: "der", en: "ID card", de: "der Ausweis" },
+    { article: "der", en: "entrance", de: "der Eingang" },
+    { article: "der", en: "entry / admission", de: "der Eintritt" },
+    { article: "der", en: "mistake", de: "der Fehler" },
+    { article: "der", en: "conclusion / end", de: "der Schluss" },
+    { article: "der", en: "appointment", de: "der Termin" },
+    { article: "der", en: "vacation / holiday", de: "der Urlaub" },
+    { article: "der", en: "customs / duty", de: "der Zoll" },
+    { article: "der", en: "arm", de: "der Arm" },
+    { article: "der", en: "belly", de: "der Bauch" },
+    { article: "der", en: "foot", de: "der Fuß" },
+    { article: "der", en: "head", de: "der Kopf" },
+    { article: "der", en: "mouth", de: "der Mund" },
+    { article: "der", en: "departure / take-off", de: "der Abflug" },
+    { article: "der", en: "birthday", de: "der Geburtstag" },
+    { article: "der", en: "morning", de: "der Morgen" },
+    { article: "der", en: "lesson / class", de: "der Unterricht" },
+    { article: "der", en: "bus", de: "der Bus" },
+    { article: "der", en: "surname", de: "der Familienname" },
+    { article: "der", en: "marital status", de: "der Familienstand" },
+    { article: "der", en: "degree", de: "der Grad" },
+    { article: "der", en: "greeting", de: "der Gruß" },
+    { article: "der", en: "dog", de: "der Hund" },
+    { article: "der", en: "course", de: "der Kurs" },
+    { article: "der", en: "name", de: "der Name" },
+    { article: "der", en: "partner", de: "der Partner" },
+    { article: "der", en: "passport", de: "der Pass" },
+    { article: "der", en: "son", de: "der Sohn" },
+    { article: "der", en: "first name", de: "der Vorname" },
+    { article: "der", en: "wind", de: "der Wind" },
+    { article: "der", en: "view / glance", de: "der Blick" },
+    { article: "der", en: "sheet / arc", de: "der Bogen" },
+    { article: "der", en: "recipient", de: "der Empfänger" },
+    { article: "der", en: "congratulations", de: "der Glückwunsch" },
+    { article: "der", en: "stove", de: "der Herd" },
+    { article: "der", en: "suitcase", de: "der Koffer" },
+    { article: "der", en: "truck", de: "der Lkw" },
+    { article: "der", en: "place / location", de: "der Ort" },
+    { article: "der", en: "guidebook", de: "der Reiseführer" },
+    { article: "der", en: "sentence", de: "der Satz" },
+    { article: "der", en: "part", de: "der Teil" },
+    { article: "das", en: "baby", de: "das Baby" },
+    { article: "das", en: "child", de: "das Kind" },
+    { article: "das", en: "girl", de: "das Mädchen" },
+    { article: "das", en: "apartment", de: "das Apartment" },
+    { article: "das", en: "bath / bathroom", de: "das Bad" },
+    { article: "das", en: "bed", de: "das Bett" },
+    { article: "das", en: "café", de: "das Café" },
+    { article: "das", en: "house", de: "das Haus" },
+    { article: "das", en: "hotel", de: "das Hotel" },
+    { article: "das", en: "cinema", de: "das Kino" },
+    { article: "das", en: "country / land", de: "das Land" },
+    { article: "das", en: "local / restaurant / bar", de: "das Lokal" },
+    { article: "das", en: "restaurant", de: "das Restaurant" },
+    { article: "das", en: "swimming pool", de: "das Schwimmbad" },
+    { article: "das", en: "abroad / foreign country", de: "das Ausland" },
+    { article: "das", en: "village", de: "das Dorf" },
+    { article: "das", en: "sea / ocean", de: "das Meer" },
+    { article: "das", en: "room", de: "das Zimmer" },
+    { article: "das", en: "eye", de: "das Auge" },
+    { article: "das", en: "car", de: "das Auto" },
+    { article: "das", en: "book", de: "das Buch" },
+    { article: "das", en: "fax", de: "das Fax" },
+    { article: "das", en: "form", de: "das Formular" },
+    { article: "das", en: "photo", de: "das Foto" },
+    { article: "das", en: "glass", de: "das Glas" },
+    { article: "das", en: "hair", de: "das Haar" },
+    { article: "das", en: "cell phone", de: "das Handy" },
+    { article: "das", en: "internet", de: "das Internet" },
+    { article: "das", en: "account", de: "das Konto" },
+    { article: "das", en: "motorbike", de: "das Motorrad" },
+    { article: "das", en: "paper", de: "das Papier" },
+    { article: "das", en: "sign / shield", de: "das Schild" },
+    { article: "das", en: "sofa", de: "das Sofa" },
+    { article: "das", en: "cab / taxi", de: "das Taxi" },
+    { article: "das", en: "telephone", de: "das Telefon" },
+    { article: "das", en: "ticket", de: "das Ticket" },
+    { article: "das", en: "picture", de: "das Bild" },
+    { article: "das", en: "bicycle", de: "das Fahrrad" },
+    { article: "das", en: "chicken (food)", de: "das Hähnchen" },
+    { article: "das", en: "beer", de: "das Bier" },
+    { article: "das", en: "bread", de: "das Brot" },
+    { article: "das", en: "bread bun", de: "das Brötchen" },
+    { article: "das", en: "drink / beverage", de: "das Getränk" },
+    { article: "das", en: "oil", de: "das Öl" },
+    { article: "das", en: "salt", de: "das Salz" },
+    { article: "das", en: "egg", de: "das Ei" },
+    { article: "das", en: "food", de: "das Essen" },
+    { article: "das", en: "meat", de: "das Fleisch" },
+    { article: "das", en: "vegetables", de: "das Gemüse" },
+    { article: "das", en: "fruit", de: "das Obst" },
+    { article: "das", en: "age", de: "das Alter" },
+    { article: "das", en: "date", de: "das Datum" },
+    { article: "das", en: "end", de: "das Ende" },
+    { article: "das", en: "weight", de: "das Gewicht" },
+    { article: "das", en: "hobby", de: "das Hobby" },
+    { article: "das", en: "life", de: "das Leben" },
+    { article: "das", en: "light", de: "das Licht" },
+    { article: "das", en: "problem", de: "das Problem" },
+    { article: "das", en: "studies / study", de: "das Studium" },
+    { article: "das", en: "topic / theme", de: "das Thema" },
+    { article: "das", en: "water", de: "das Wasser" },
+    { article: "das", en: "weather", de: "das Wetter" },
+    { article: "das", en: "word", de: "das Wort" },
+    { article: "das", en: "offer", de: "das Angebot" },
+    { article: "das", en: "example", de: "das Beispiel" },
+    { article: "das", en: "breakfast", de: "das Frühstück" },
+    { article: "das", en: "year of birth", de: "das Geburtsjahr" },
+    { article: "das", en: "money", de: "das Geld" },
+    { article: "das", en: "business / store", de: "das Geschäft" },
+    { article: "das", en: "conversation", de: "das Gespräch" },
+    { article: "das", en: "happiness / luck", de: "das Glück" },
+    { article: "das", en: "track / platform", de: "das Gleis" },
+    { article: "das", en: "song", de: "das Lied" },
+    { article: "das", en: "result", de: "das Ergebnis" },
+    { article: "das", en: "internship", de: "das Praktikum" },
+    { article: "das", en: "weekend", de: "das Wochenende" },
+    { article: "das", en: "double room", de: "das Doppelzimmer" },
+    { article: "das", en: "fire", de: "das Feuer" },
+    { article: "das", en: "fever", de: "das Fieber" },
+    { article: "das", en: "leg", de: "das Bein" },
+    { article: "das", en: "single room", de: "das Einzelzimmer" },
+    { article: "das", en: "luggage", de: "das Gepäck" },
+    { article: "das", en: "gift", de: "das Geschenk" },
+    { article: "das", en: "goodbye (on phone)", de: "das Wiederhören" },
+    { article: "das", en: "reunion / goodbye", de: "das Wiedersehen" },
+    { article: "das", en: "travel agency", de: "das Reisebüro" },
+    { article: "das", en: "airplane", de: "das Flugzeug" },
+    { article: "die", en: "parents (pl.)", de: "die Eltern" },
+    { article: "die", en: "grandparents (pl.)", de: "die Großeltern" },
+    { article: "die", en: "grandmother", de: "die Großmutter" },
+    { article: "die", en: "housewife", de: "die Hausfrau" },
+    { article: "die", en: "mother", de: "die Mutter" },
+    { article: "die", en: "partner (female)", de: "die Partnerin" },
+    { article: "die", en: "sister", de: "die Schwester" },
+    { article: "die", en: "daughter", de: "die Tochter" },
+    { article: "die", en: "acquaintance (female)", de: "die Bekannte" },
+    { article: "die", en: "wife", de: "die Ehefrau" },
+    { article: "die", en: "woman / lady", de: "die Frau" },
+    { article: "die", en: "siblings (pl.)", de: "die Geschwister" },
+    { article: "die", en: "people (pl.)", de: "die Leute" },
+    { article: "die", en: "granny", de: "die Oma" },
+    { article: "die", en: "saleswoman", de: "die Verkäuferin" },
+    { article: "die", en: "landlady", de: "die Vermieterin" },
+    { article: "die", en: "highway / motorway", de: "die Autobahn" },
+    { article: "die", en: "bakery", de: "die Bäckerei" },
+    { article: "die", en: "bank", de: "die Bank" },
+    { article: "die", en: "disco", de: "die Disco" },
+    { article: "die", en: "hall", de: "die Halle" },
+    { article: "die", en: "kitchen", de: "die Küche" },
+    { article: "die", en: "post office", de: "die Post" },
+    { article: "die", en: "reception", de: "die Rezeption" },
+    { article: "die", en: "school", de: "die Schule" },
+    { article: "die", en: "street", de: "die Straße" },
+    { article: "die", en: "world", de: "die Welt" },
+    { article: "die", en: "corner", de: "die Ecke" },
+    { article: "die", en: "stop (bus/tram)", de: "die Haltestelle" },
+    { article: "die", en: "homeland", de: "die Heimat" },
+    { article: "die", en: "sight / tourist attraction", de: "die Sehenswürdigkeit" },
+    { article: "die", en: "city", de: "die Stadt" },
+    { article: "die", en: "place / position", de: "die Stelle" },
+    { article: "die", en: "apartment / flat", de: "die Wohnung" },
+    { article: "die", en: "flower", de: "die Blume" },
+    { article: "die", en: "CD", de: "die CD" },
+    { article: "die", en: "hand", de: "die Hand" },
+    { article: "die", en: "jacket", de: "die Jacke" },
+    { article: "die", en: "card", de: "die Karte" },
+    { article: "die", en: "machine", de: "die Maschine" },
+    { article: "die", en: "cigarette", de: "die Zigarette" },
+    { article: "die", en: "equipment", de: "die Ausrüstung" },
+    { article: "die", en: "stamp", de: "die Briefmarke" },
+    { article: "die", en: "shower", de: "die Dusche" },
+    { article: "die", en: "bottle", de: "die Flasche" },
+    { article: "die", en: "cash register", de: "die Kasse" },
+    { article: "die", en: "clothes / clothing", de: "die Kleidung" },
+    { article: "die", en: "furniture (pl.)", de: "die Möbel" },
+    { article: "die", en: "menu", de: "die Speisekarte" },
+    { article: "die", en: "bag", de: "die Tasche" },
+    { article: "die", en: "stairs", de: "die Treppe" },
+    { article: "die", en: "clock / hour", de: "die Uhr" },
+    { article: "die", en: "banana", de: "die Banane" },
+    { article: "die", en: "butter", de: "die Butter" },
+    { article: "die", en: "milk", de: "die Milch" },
+    { article: "die", en: "French fries", de: "die Pommes frites" },
+    { article: "die", en: "tomato", de: "die Tomate" },
+    { article: "die", en: "pear", de: "die Birne" },
+    { article: "die", en: "potato", de: "die Kartoffel" },
+    { article: "die", en: "groceries (pl.)", de: "die Lebensmittel" },
+    { article: "die", en: "address", de: "die Adresse" },
+    { article: "die", en: "duration", de: "die Dauer" },
+    { article: "die", en: "family", de: "die Familie" },
+    { article: "die", en: "firm / company", de: "die Firma" },
+    { article: "die", en: "leisure / free time", de: "die Freizeit" },
+    { article: "die", en: "half board", de: "die Halbpension" },
+    { article: "die", en: "help", de: "die Hilfe" },
+    { article: "die", en: "information", de: "die Information" },
+    { article: "die", en: "desire / interest", de: "die Lust" },
+    { article: "die", en: "middle", de: "die Mitte" },
+    { article: "die", en: "order", de: "die Ordnung" },
+    { article: "die", en: "break / pause", de: "die Pause" },
+    { article: "die", en: "practice / clinic", de: "die Praxis" },
+    { article: "die", en: "repair", de: "die Reparatur" },
+    { article: "die", en: "departure", de: "die Abfahrt" },
+    { article: "die", en: "attention", de: "die Achtung" },
+    { article: "die", en: "arrival", de: "die Ankunft" },
+    { article: "die", en: "registration", de: "die Anmeldung" },
+    { article: "die", en: "salutation", de: "die Anrede" },
+    { article: "die", en: "answer / reply", de: "die Antwort" },
+    { article: "die", en: "work", de: "die Arbeit" },
+    { article: "die", en: "task", de: "die Aufgabe" },
+    { article: "die", en: "information (desk)", de: "die Auskunft" },
+    { article: "die", en: "statement", de: "die Aussage" },
+    { article: "die", en: "announcement", de: "die Durchsage" },
+    { article: "die", en: "invitation", de: "die Einladung" },
+    { article: "die", en: "excuse / apology", de: "die Entschuldigung" },
+    { article: "die", en: "ticket (transport)", de: "die Fahrkarte" },
+    { article: "die", en: "color", de: "die Farbe" },
+    { article: "die", en: "question", de: "die Frage" },
+    { article: "die", en: "leadership / tour", de: "die Führung" },
+    { article: "die", en: "size", de: "die Größe" },
+    { article: "die", en: "solution", de: "die Lösung" },
+    { article: "die", en: "exam", de: "die Prüfung" },
+    { article: "die", en: "S-Bahn (suburban train)", de: "die S-Bahn" },
+    { article: "die", en: "language", de: "die Sprache" },
+    { article: "die", en: "hour", de: "die Stunde" },
+    { article: "die", en: "tramway", de: "die Straßenbahn" },
+    { article: "die", en: "signature", de: "die Unterschrift" },
+    { article: "die", en: "caution", de: "die Vorsicht" },
+    { article: "die", en: "time", de: "die Zeit" },
+    { article: "die", en: "group", de: "die Gruppe" },
+    { article: "die", en: "celebration", de: "die Feier" },
+    { article: "die", en: "wedding", de: "die Hochzeit" },
+    { article: "die", en: "trip / journey", de: "die Reise" },
+    { article: "die", en: "e-mail", de: "die E-Mail" },
+    { article: "die", en: "papers (pl.)", de: "die Papiere" },
+    { article: "die", en: "advertisement / notice", de: "die Anzeige" },
+    { article: "die", en: "announcement", de: "die Ansage" },
+    { article: "die", en: "message", de: "die Nachricht" },
+    { article: "die", en: "bill / invoice", de: "die Rechnung" },
+    { article: "die", en: "homework", de: "die Hausaufgabe" },
+    { article: "die", en: "class", de: "die Klasse" },
+    { article: "die", en: "credit card", de: "die Kreditkarte" },
+    { article: "die", en: "number", de: "die Nummer" },
+    { article: "die", en: "party", de: "die Party" },
+    { article: "die", en: "police", de: "die Polizei" },
+    { article: "die", en: "postal code", de: "die Postleitzahl" },
+    { article: "die", en: "sun", de: "die Sonne" },
+    { article: "die", en: "toilet", de: "die Toilette" },
+    { article: "die", en: "railroad / train", de: "die Bahn" },
+    { article: "die", en: "request", de: "die Bitte" },
+    { article: "die", en: "rent", de: "die Miete" },
+    { article: "die", en: "area code", de: "die Vorwahl" },
+    { article: "die", en: "newspaper", de: "die Zeitung" }
+];
+
+const A1_OTHERS = [
+    // Relationship
+    { cat: "Relationship", en: "family", de: "die Familie" },
+    { cat: "Relationship", en: "father", de: "der Vater" },
+    { cat: "Relationship", en: "mother", de: "die Mutter" },
+    { cat: "Relationship", en: "son", de: "der Sohn" },
+    { cat: "Relationship", en: "daughter", de: "die Tochter" },
+    { cat: "Relationship", en: "brother", de: "der Bruder" },
+    { cat: "Relationship", en: "sister", de: "die Schwester" },
+    { cat: "Relationship", en: "grandfather", de: "der Großvater" },
+    { cat: "Relationship", en: "grandmother", de: "die Großmutter" },
+    { cat: "Relationship", en: "uncle", de: "der Onkel" },
+    { cat: "Relationship", en: "aunt", de: "die Tante" },
+    { cat: "Relationship", en: "cousin (male)", de: "der Cousin" },
+    { cat: "Relationship", en: "cousin (female)", de: "die Cousine" },
+    // Vegetables
+    { cat: "Vegetables", en: "onion", de: "die Zwiebel" },
+    { cat: "Vegetables", en: "potato", de: "die Kartoffel" },
+    { cat: "Vegetables", en: "carrot", de: "die Karotte" },
+    { cat: "Vegetables", en: "tomato", de: "die Tomate" },
+    { cat: "Vegetables", en: "cucumber", de: "die Gurke" },
+    { cat: "Vegetables", en: "bell pepper", de: "die Paprika" },
+    { cat: "Vegetables", en: "spinach", de: "der Spinat" },
+    { cat: "Vegetables", en: "lettuce", de: "der Salat" },
+    { cat: "Vegetables", en: "cabbage", de: "der Kohl" },
+    { cat: "Vegetables", en: "broccoli", de: "der Brokkoli" },
+    { cat: "Vegetables", en: "cauliflower", de: "der Blumenkohl" },
+    { cat: "Vegetables", en: "celery", de: "der Sellerie" },
+    { cat: "Vegetables", en: "eggplant", de: "die Aubergine" },
+    { cat: "Vegetables", en: "mushroom", de: "der Pilz" },
+    { cat: "Vegetables", en: "beans", de: "die Bohnen" },
+    { cat: "Vegetables", en: "pea", de: "die Erbse" },
+    { cat: "Vegetables", en: "zucchini", de: "die Zucchini" },
+    { cat: "Vegetables", en: "pumpkin", de: "der Kürbis" },
+    { cat: "Vegetables", en: "corn", de: "der Mais" },
+    { cat: "Vegetables", en: "asparagus", de: "der Spargel" },
+    { cat: "Vegetables", en: "beetroot", de: "die Rote Beete" },
+    { cat: "Vegetables", en: "garlic", de: "der Knoblauch" },
+    { cat: "Vegetables", en: "radish", de: "das Radieschen" },
+    { cat: "Vegetables", en: "turnip", de: "die Rübe" },
+    { cat: "Vegetables", en: "artichoke", de: "die Artischocke" },
+    // Fruits
+    { cat: "Fruits", en: "apple", de: "der Apfel" },
+    { cat: "Fruits", en: "pear", de: "die Birne" },
+    { cat: "Fruits", en: "banana", de: "die Banane" },
+    { cat: "Fruits", en: "orange", de: "die Orange" },
+    { cat: "Fruits", en: "lemon", de: "die Zitrone" },
+    { cat: "Fruits", en: "lime", de: "die Limette" },
+    { cat: "Fruits", en: "peach", de: "der Pfirsich" },
+    { cat: "Fruits", en: "strawberry", de: "die Erdbeere" },
+    { cat: "Fruits", en: "raspberry", de: "die Himbeere" },
+    { cat: "Fruits", en: "blackberry", de: "die Brombeere" },
+    { cat: "Fruits", en: "blueberry", de: "die Blaubeere" },
+    { cat: "Fruits", en: "grape", de: "die Traube" },
+    { cat: "Fruits", en: "kiwi", de: "die Kiwi" },
+    { cat: "Fruits", en: "watermelon", de: "die Wassermelone" },
+    { cat: "Fruits", en: "cantaloupe", de: "die Honigmelone" },
+    { cat: "Fruits", en: "pineapple", de: "die Ananas" },
+    { cat: "Fruits", en: "mango", de: "die Mango" },
+    { cat: "Fruits", en: "papaya", de: "die Papaya" },
+    { cat: "Fruits", en: "pomegranate", de: "der Granatapfel" },
+    { cat: "Fruits", en: "cherry", de: "die Kirsche" },
+    { cat: "Fruits", en: "apricot", de: "die Aprikose" },
+    { cat: "Fruits", en: "plum", de: "die Pflaume" },
+    { cat: "Fruits", en: "fig", de: "die Feige" },
+    { cat: "Fruits", en: "date (fruit)", de: "die Dattel" },
+    { cat: "Fruits", en: "grapefruit", de: "die Grapefruit" },
+    { cat: "Fruits", en: "tangerine", de: "die Mandarine" },
+    { cat: "Fruits", en: "clementine", de: "die Clementine" },
+    { cat: "Fruits", en: "nectarine", de: "die Nektarine" },
+    { cat: "Fruits", en: "mirabelle", de: "die Mirabelle" },
+    { cat: "Fruits", en: "passion fruit", de: "die Maracuja" },
+    { cat: "Fruits", en: "currant", de: "die Johannisbeere" },
+    { cat: "Fruits", en: "gooseberry", de: "die Stachelbeere" },
+    // Countries
+    { cat: "Countries", en: "Germany", de: "Deutschland" },
+    { cat: "Countries", en: "Austria", de: "Österreich" },
+    { cat: "Countries", en: "Switzerland", de: "Schweiz" },
+    { cat: "Countries", en: "France", de: "Frankreich" },
+    { cat: "Countries", en: "Spain", de: "Spanien" },
+    { cat: "Countries", en: "Italy", de: "Italien" },
+    { cat: "Countries", en: "United Kingdom", de: "Großbritannien" },
+    { cat: "Countries", en: "United States", de: "Vereinigte Staaten" },
+    { cat: "Countries", en: "Canada", de: "Kanada" },
+    { cat: "Countries", en: "Australia", de: "Australien" },
+    { cat: "Countries", en: "China", de: "China" },
+    { cat: "Countries", en: "Japan", de: "Japan" },
+    { cat: "Countries", en: "Russia", de: "Russland" },
+    { cat: "Countries", en: "Brazil", de: "Brasilien" },
+    { cat: "Countries", en: "India", de: "Indien" },
+    { cat: "Countries", en: "Mexico", de: "Mexiko" },
+    { cat: "Countries", en: "South Africa", de: "Südafrika" },
+    { cat: "Countries", en: "Argentina", de: "Argentinien" },
+    { cat: "Countries", en: "Chile", de: "Chile" },
+    { cat: "Countries", en: "Colombia", de: "Kolumbien" },
+    { cat: "Countries", en: "New Zealand", de: "Neuseeland" },
+    { cat: "Countries", en: "Peru", de: "Peru" },
+    { cat: "Countries", en: "Venezuela", de: "Venezuela" },
+    { cat: "Countries", en: "Belgium", de: "Belgien" },
+    { cat: "Countries", en: "Netherlands", de: "Niederlande" },
+    { cat: "Countries", en: "Portugal", de: "Portugal" },
+    { cat: "Countries", en: "Sweden", de: "Schweden" },
+    { cat: "Countries", en: "Norway", de: "Norwegen" },
+    { cat: "Countries", en: "Denmark", de: "Dänemark" },
+    { cat: "Countries", en: "Finland", de: "Finnland" },
+    { cat: "Countries", en: "Greece", de: "Griechenland" },
+    { cat: "Countries", en: "Poland", de: "Polen" },
+    { cat: "Countries", en: "Turkey", de: "Türkei" },
+    { cat: "Countries", en: "Hungary", de: "Ungarn" },
+    { cat: "Countries", en: "Czech Republic", de: "Tschechien" },
+    { cat: "Countries", en: "Thailand", de: "Thailand" },
+    { cat: "Countries", en: "Vietnam", de: "Vietnam" },
+    { cat: "Countries", en: "Malaysia", de: "Malaysia" },
+    { cat: "Countries", en: "South Korea", de: "Südkorea" },
+    { cat: "Countries", en: "Philippines", de: "Philippinen" },
+    // Animals
+    { cat: "Animals", en: "dog", de: "der Hund" },
+    { cat: "Animals", en: "cat", de: "die Katze" },
+    { cat: "Animals", en: "horse", de: "das Pferd" },
+    { cat: "Animals", en: "bird", de: "der Vogel" },
+    { cat: "Animals", en: "rabbit", de: "das Kaninchen" },
+    { cat: "Animals", en: "mouse", de: "die Maus" },
+    { cat: "Animals", en: "tiger", de: "der Tiger" },
+    { cat: "Animals", en: "lion", de: "der Löwe" },
+    { cat: "Animals", en: "bear", de: "der Bär" },
+    { cat: "Animals", en: "crocodile", de: "das Krokodil" },
+    { cat: "Animals", en: "elephant", de: "der Elefant" },
+    { cat: "Animals", en: "rhinoceros", de: "das Nashorn" },
+    { cat: "Animals", en: "kangaroo", de: "das Känguru" },
+    { cat: "Animals", en: "monkey", de: "der Affe" },
+    { cat: "Animals", en: "snake", de: "die Schlange" },
+    { cat: "Animals", en: "fox", de: "der Fuchs" },
+    { cat: "Animals", en: "pig", de: "das Schwein" },
+    { cat: "Animals", en: "sheep", de: "das Schaf" },
+    { cat: "Animals", en: "goat", de: "die Ziege" },
+    { cat: "Animals", en: "chicken (bird)", de: "das Huhn" },
+    { cat: "Animals", en: "duck", de: "die Ente" },
+    { cat: "Animals", en: "rooster", de: "der Hahn" },
+    { cat: "Animals", en: "kitten", de: "das Kätzchen" },
+    { cat: "Animals", en: "puppy", de: "der Welpe" },
+    { cat: "Animals", en: "lamb", de: "das Lamm" },
+    { cat: "Animals", en: "eagle", de: "der Adler" },
+    { cat: "Animals", en: "falcon", de: "der Falke" },
+    { cat: "Animals", en: "squirrel", de: "das Eichhörnchen" },
+    { cat: "Animals", en: "bee", de: "die Biene" },
+    { cat: "Animals", en: "ant", de: "die Ameise" },
+    { cat: "Animals", en: "spider", de: "die Spinne" },
+    { cat: "Animals", en: "fly (insect)", de: "die Fliege" },
+    { cat: "Animals", en: "wasp", de: "die Wespe" },
+    { cat: "Animals", en: "butterfly", de: "der Schmetterling" },
+    { cat: "Animals", en: "dragonfly", de: "die Libelle" },
+    { cat: "Animals", en: "frog", de: "der Frosch" },
+    { cat: "Animals", en: "turtle", de: "die Schildkröte" },
+    { cat: "Animals", en: "hare", de: "der Hase" },
+    { cat: "Animals", en: "deer", de: "das Reh" },
+    // Languages
+    { cat: "Languages", en: "German (language)", de: "Deutsch" },
+    { cat: "Languages", en: "English (language)", de: "Englisch" },
+    { cat: "Languages", en: "French (language)", de: "Französisch" },
+    { cat: "Languages", en: "Spanish (language)", de: "Spanisch" },
+    { cat: "Languages", en: "Italian (language)", de: "Italienisch" },
+    { cat: "Languages", en: "Portuguese (language)", de: "Portugiesisch" },
+    { cat: "Languages", en: "Russian (language)", de: "Russisch" },
+    { cat: "Languages", en: "Chinese (language)", de: "Chinesisch" },
+    { cat: "Languages", en: "Japanese (language)", de: "Japanisch" },
+    { cat: "Languages", en: "Korean (language)", de: "Koreanisch" },
+    { cat: "Languages", en: "Arabic (language)", de: "Arabisch" },
+    { cat: "Languages", en: "Turkish (language)", de: "Türkisch" },
+    { cat: "Languages", en: "Greek (language)", de: "Griechisch" },
+    { cat: "Languages", en: "Dutch (language)", de: "Niederländisch" },
+    { cat: "Languages", en: "Swedish (language)", de: "Schwedisch" },
+    { cat: "Languages", en: "Norwegian (language)", de: "Norwegisch" },
+    { cat: "Languages", en: "Danish (language)", de: "Dänisch" },
+    { cat: "Languages", en: "Finnish (language)", de: "Finnisch" },
+    { cat: "Languages", en: "Polish (language)", de: "Polnisch" },
+    { cat: "Languages", en: "Czech (language)", de: "Tschechisch" },
+    { cat: "Languages", en: "Hungarian (language)", de: "Ungarisch" },
+    { cat: "Languages", en: "Romanian (language)", de: "Rumänisch" },
+    { cat: "Languages", en: "Bulgarian (language)", de: "Bulgarisch" },
+    { cat: "Languages", en: "Serbian (language)", de: "Serbisch" },
+    { cat: "Languages", en: "Croatian (language)", de: "Kroatisch" },
+    { cat: "Languages", en: "Slovenian (language)", de: "Slowenisch" },
+    { cat: "Languages", en: "Slovak (language)", de: "Slowakisch" },
+    // Transportation
+    { cat: "Transportation", en: "bus", de: "der Bus" },
+    { cat: "Transportation", en: "train", de: "der Zug" },
+    { cat: "Transportation", en: "car", de: "das Auto" },
+    { cat: "Transportation", en: "bicycle", de: "das Fahrrad" },
+    { cat: "Transportation", en: "motorcycle", de: "das Motorrad" },
+    { cat: "Transportation", en: "subway", de: "die U-Bahn" },
+    { cat: "Transportation", en: "tram", de: "die Straßenbahn" },
+    { cat: "Transportation", en: "airplane", de: "das Flugzeug" },
+    { cat: "Transportation", en: "ship", de: "das Schiff" },
+    { cat: "Transportation", en: "taxi", de: "das Taxi" },
+    { cat: "Transportation", en: "helicopter", de: "der Hubschrauber" },
+    { cat: "Transportation", en: "ferry", de: "die Fähre" },
+    { cat: "Transportation", en: "truck", de: "der Lastwagen" },
+    { cat: "Transportation", en: "boat", de: "das Boot" },
+    { cat: "Transportation", en: "yacht", de: "die Yacht" },
+    { cat: "Transportation", en: "tractor", de: "der Traktor" },
+    { cat: "Transportation", en: "unicycle", de: "das Skateboard" },
+    { cat: "Transportation", en: "skateboard", de: "die Rollschuhe" },
+    { cat: "Transportation", en: "cable car", de: "die Seilbahn" },
+    // Clothing
+    { cat: "Clothing", en: "shirt", de: "das Hemd" },
+    { cat: "Clothing", en: "pants / trousers", de: "die Hose" },
+    { cat: "Clothing", en: "dress", de: "das Kleid" },
+    { cat: "Clothing", en: "skirt", de: "der Rock" },
+    { cat: "Clothing", en: "suit", de: "der Anzug" },
+    { cat: "Clothing", en: "T-shirt", de: "das T-Shirt" },
+    { cat: "Clothing", en: "sweater / jumper", de: "der Pullover" },
+    { cat: "Clothing", en: "jacket", de: "die Jacke" },
+    { cat: "Clothing", en: "coat", de: "der Mantel" },
+    { cat: "Clothing", en: "blouse", de: "die Bluse" },
+    { cat: "Clothing", en: "jeans", de: "die Jeans" },
+    { cat: "Clothing", en: "scarf", de: "der Schal" },
+    { cat: "Clothing", en: "hat / cap", de: "die Mütze" },
+    { cat: "Clothing", en: "gloves", de: "die Handschuhe" },
+    { cat: "Clothing", en: "socks", de: "die Socken" },
+    { cat: "Clothing", en: "underwear", de: "die Unterwäsche" },
+    { cat: "Clothing", en: "shoe", de: "der Schuh" },
+    { cat: "Clothing", en: "boot", de: "der Stiefel" },
+    { cat: "Clothing", en: "belt", de: "der Gürtel" },
+    { cat: "Clothing", en: "tie", de: "die Krawatte" },
+    { cat: "Clothing", en: "raincoat", de: "der Regenmantel" },
+    { cat: "Clothing", en: "flip-flops", de: "die Flip-Flops" },
+    // Furniture
+    { cat: "Furniture", en: "table", de: "der Tisch" },
+    { cat: "Furniture", en: "chair", de: "der Stuhl" },
+    { cat: "Furniture", en: "sofa", de: "das Sofa" },
+    { cat: "Furniture", en: "cupboard", de: "der Schrank" },
+    { cat: "Furniture", en: "bed", de: "das Bett" },
+    { cat: "Furniture", en: "mirror", de: "der Spiegel" },
+    { cat: "Furniture", en: "desk", de: "der Schreibtisch" },
+    { cat: "Furniture", en: "shelf", de: "das Regal" },
+    { cat: "Furniture", en: "couch", de: "die Couch" },
+    // Common places
+    { cat: "Common Places", en: "hospital", de: "das Krankenhaus" },
+    { cat: "Common Places", en: "post office", de: "das Postamt" },
+    { cat: "Common Places", en: "train station", de: "der Bahnhof" },
+    { cat: "Common Places", en: "airport", de: "der Flughafen" },
+    { cat: "Common Places", en: "school", de: "die Schule" },
+    { cat: "Common Places", en: "university", de: "die Universität" },
+    { cat: "Common Places", en: "library", de: "die Bibliothek" },
+    { cat: "Common Places", en: "museum", de: "das Museum" },
+    { cat: "Common Places", en: "cinema", de: "das Kino" },
+    { cat: "Common Places", en: "theater", de: "das Theater" },
+    { cat: "Common Places", en: "supermarket", de: "der Supermarkt" },
+    { cat: "Common Places", en: "pharmacy", de: "die Apotheke" },
+    { cat: "Common Places", en: "bank", de: "die Bank" },
+    { cat: "Common Places", en: "police station", de: "die Polizeistation" },
+    { cat: "Common Places", en: "town hall", de: "das Rathaus" },
+    { cat: "Common Places", en: "church", de: "die Kirche" },
+    { cat: "Common Places", en: "hotel", de: "das Hotel" },
+    { cat: "Common Places", en: "restaurant", de: "das Restaurant" },
+    { cat: "Common Places", en: "café", de: "das Café" }
+];
+
+// ============================================================
+// A2 DATA
+// ============================================================
+const A2_VERBS = [
+    { en: "change", form: "ändern", past: "hat geändert" },
+    { en: "start", form: "starten", past: "hat gestartet" },
+    { en: "begin", form: "beginnen", past: "hat begonnen" },
+    { en: "answer", form: "antworten", past: "hat geantwortet" },
+    { en: "work", form: "arbeiten", past: "hat gearbeitet" },
+    { en: "clean up", form: "putzen", past: "hat geputzt" },
+    { en: "clean / purify", form: "reinigen", past: "hat gereinigt" },
+    { en: "cough", form: "husten", past: "hat gehustet" },
+    { en: "spend (time)", form: "verbringen", past: "hat verbracht" },
+    { en: "plan", form: "planen", past: "hat geplant" },
+    { en: "bake", form: "backen", past: "hat gebacken" },
+    { en: "bathe", form: "baden", past: "hat gebadet" },
+    { en: "craft / make", form: "basteln", past: "hat gebastelt" },
+    { en: "build", form: "bauen", past: "hat gebaut" },
+    { en: "mean (subject: es)", form: "bedeuten", past: "hat bedeutet" },
+    { en: "finish", form: "beenden", past: "hat beendet" },
+    { en: "justify / found", form: "begründen", past: "hat begründet" },
+    { en: "get / receive", form: "bekommen", past: "hat bekommen" },
+    { en: "receive (formal)", form: "erhalten", past: "hat erhalten" },
+    { en: "use", form: "benutzen", past: "hat benutzt" },
+    { en: "consult", form: "beraten", past: "hat beraten" },
+    { en: "report", form: "berichten", past: "hat berichtet" },
+    { en: "describe", form: "beschreiben", past: "hat beschrieben" },
+    { en: "visit (place)", form: "besichtigen", past: "hat besichtigt" },
+    { en: "visit (person)", form: "besuchen", past: "hat besucht" },
+    { en: "confirm", form: "bestätigen", past: "hat bestätigt" },
+    { en: "insist / pass (exam)", form: "bestehen", past: "hat bestanden" },
+    { en: "order", form: "bestellen", past: "hat bestellt" },
+    { en: "pay", form: "bezahlen", past: "hat bezahlt" },
+    { en: "request / beg", form: "bitten", past: "hat gebeten" },
+    { en: "stay", form: "bleiben", past: "ist geblieben" },
+    { en: "fry / roast", form: "braten", past: "hat gebraten" },
+    { en: "need", form: "brauchen", past: "hat gebraucht" },
+    { en: "bring", form: "bringen", past: "hat gebracht" },
+    { en: "book", form: "buchen", past: "hat gebucht" },
+    { en: "spell", form: "buchstabieren", past: "hat buchstabiert" },
+    { en: "chat", form: "chatten", past: "hat gechattet" },
+    { en: "last / take time", form: "dauern", past: "hat gedauert" },
+    { en: "think", form: "denken", past: "hat gedacht" },
+    { en: "thank", form: "danken", past: "hat gedankt" },
+    { en: "discuss", form: "diskutieren", past: "hat diskutiert" },
+    { en: "push / press", form: "drücken", past: "hat gedrückt" },
+    { en: "print", form: "drucken", past: "hat gedruckt" },
+    { en: "recommend", form: "empfehlen", past: "hat empfohlen" },
+    { en: "end", form: "enden", past: "hat geendet" },
+    { en: "explain", form: "erklären", past: "hat erklärt" },
+    { en: "allow", form: "erlauben", past: "hat erlaubt" },
+    { en: "reach", form: "erreichen", past: "hat erreicht" },
+    { en: "fall", form: "fallen", past: "ist gefallen" },
+    { en: "tell (a story)", form: "erzählen", past: "hat erzählt" },
+    { en: "eat", form: "essen", past: "hat gegessen" },
+    { en: "be missing", form: "fehlen", past: "hat gefehlt" },
+    { en: "celebrate", form: "feiern", past: "hat gefeiert" },
+    { en: "find", form: "finden", past: "hat gefunden" },
+    { en: "photograph", form: "fotografieren", past: "hat fotografiert" },
+    { en: "ask", form: "fragen", past: "hat gefragt" },
+    { en: "have breakfast", form: "frühstücken", past: "hat gefrühstückt" },
+    { en: "give", form: "geben", past: "hat gegeben" },
+    { en: "to be liked / please", form: "gefallen", past: "hat gefallen" },
+    { en: "go", form: "gehen", past: "ist gegangen" },
+    { en: "belong", form: "gehören", past: "hat gehört" },
+    { en: "win", form: "gewinnen", past: "hat gewonnen" },
+    { en: "believe", form: "glauben", past: "hat geglaubt" },
+    { en: "congratulate", form: "gratulieren", past: "hat gratuliert" },
+    { en: "barbecue", form: "grillen", past: "hat gegrillt" },
+    { en: "have", form: "haben", past: "hat gehabt" },
+    { en: "hold", form: "halten", past: "hat gehalten" },
+    { en: "hang", form: "hängen", past: "hat gehangen / hat gehängt" },
+    { en: "marry", form: "heiraten", past: "hat geheiratet" },
+    { en: "to be called", form: "heißen", past: "hat geheißen" },
+    { en: "help", form: "helfen", past: "hat geholfen" },
+    { en: "produce", form: "herstellen", past: "hat hergestellt" },
+    { en: "download", form: "herunterladen", past: "hat heruntergeladen" },
+    { en: "hope", form: "hoffen", past: "hat gehofft" },
+    { en: "fetch", form: "holen", past: "hat geholt" },
+    { en: "hear / listen", form: "hören", past: "hat gehört" },
+    { en: "buy", form: "kaufen", past: "hat gekauft" },
+    { en: "know (be familiar)", form: "kennen", past: "hat gekannt" },
+    { en: "get to know", form: "kennenlernen", past: "hat kennengelernt" },
+    { en: "work out / fold", form: "klappen", past: "hat geklappt" },
+    { en: "cook", form: "kochen", past: "hat gekocht" },
+    { en: "come", form: "kommen", past: "ist gekommen" },
+    { en: "control / check", form: "kontrollieren", past: "hat kontrolliert" },
+    { en: "get (colloquial)", form: "kriegen", past: "hat gekriegt" },
+    { en: "cost", form: "kosten", past: "hat gekostet" },
+    { en: "cancel / quit", form: "kündigen", past: "hat gekündigt" },
+    { en: "let", form: "lassen", past: "hat gelassen" },
+    { en: "run", form: "laufen", past: "ist gelaufen" },
+    { en: "live", form: "leben", past: "hat gelebt" },
+    { en: "lay", form: "legen", past: "hat gelegt" },
+    { en: "be sorry", form: "leidtun", past: "hat leidgetan" },
+    { en: "borrow / lend", form: "leihen", past: "hat geliehen" },
+    { en: "learn", form: "lernen", past: "hat gelernt" },
+    { en: "read", form: "lesen", past: "hat gelesen" },
+    { en: "love", form: "lieben", past: "hat geliebt" },
+    { en: "deliver", form: "liefern", past: "hat geliefert" },
+    { en: "lie / be situated", form: "liegen", past: "hat / ist gelegen" },
+    { en: "tell a lie", form: "lügen", past: "hat gelogen" },
+    { en: "make", form: "machen", past: "hat gemacht" },
+    { en: "paint", form: "malen", past: "hat gemalt" },
+    { en: "mean / think", form: "meinen", past: "hat gemeint" },
+    { en: "notice / remember", form: "merken", past: "hat gemerkt" },
+    { en: "rent (as tenant)", form: "mieten", past: "hat gemietet" },
+    { en: "take", form: "nehmen", past: "hat genommen" },
+    { en: "name", form: "nennen", past: "hat genannt" },
+    { en: "note", form: "notieren", past: "hat notiert" },
+    { en: "open", form: "öffnen", past: "hat geöffnet" },
+    { en: "organize", form: "organisieren", past: "hat organisiert" },
+    { en: "pack", form: "packen", past: "hat gepackt" },
+    { en: "park", form: "parken", past: "hat geparkt" },
+    { en: "fit / suit", form: "passen", past: "hat gepasst" },
+    { en: "try / sample", form: "probieren", past: "hat probiert" },
+    { en: "examine / check", form: "prüfen", past: "hat geprüft" },
+    { en: "clean", form: "putzen", past: "hat geputzt" },
+    { en: "guess / advise", form: "raten", past: "hat geraten" },
+    { en: "smoke", form: "rauchen", past: "hat geraucht" },
+    { en: "calculate", form: "rechnen", past: "hat gerechnet" },
+    { en: "be right", form: "recht haben", past: "hat recht gehabt" },
+    { en: "talk", form: "reden", past: "hat geredet" },
+    { en: "rain", form: "regnen", past: "hat geregnet" },
+    { en: "travel", form: "reisen", past: "ist gereist" },
+    { en: "ride (horse)", form: "reiten", past: "ist geritten" },
+    { en: "renovate", form: "renovieren", past: "hat renoviert" },
+    { en: "repair", form: "reparieren", past: "hat repariert" },
+    { en: "reserve", form: "reservieren", past: "hat reserviert" },
+    { en: "smell", form: "riechen", past: "hat gerochen" },
+    { en: "call / shout", form: "rufen", past: "hat gerufen" },
+    { en: "say", form: "sagen", past: "hat gesagt" },
+    { en: "collect", form: "sammeln", past: "hat gesammelt" },
+    { en: "create / manage", form: "schaffen", past: "hat geschafft" },
+    { en: "seem / shine", form: "scheinen", past: "hat geschienen" },
+    { en: "give (as gift)", form: "schenken", past: "hat geschenkt" },
+    { en: "send", form: "schicken", past: "hat geschickt" },
+    { en: "scold", form: "schimpfen", past: "hat geschimpft" },
+    { en: "sleep", form: "schlafen", past: "hat geschlafen" },
+    { en: "drive / do (sports)", form: "treiben", past: "hat getrieben" },
+    { en: "close", form: "schließen", past: "hat geschlossen" },
+    { en: "taste", form: "schmecken", past: "hat geschmeckt" },
+    { en: "snow", form: "schneien", past: "hat geschneit" },
+    { en: "write", form: "schreiben", past: "hat geschrieben" },
+    { en: "swim", form: "schwimmen", past: "ist geschwommen" },
+    { en: "see", form: "sehen", past: "hat gesehen" },
+    { en: "sing", form: "singen", past: "hat gesungen" },
+    { en: "shall / ought to", form: "sollen", past: "hat gesollt" },
+    { en: "save (money)", form: "sparen", past: "hat gespart" },
+    { en: "save (files)", form: "speichern", past: "hat gespeichert" },
+    { en: "play", form: "spielen", past: "hat gespielt" },
+    { en: "stand", form: "stehen", past: "hat / ist gestanden" },
+    { en: "place / put", form: "stellen", past: "hat gestellt" },
+    { en: "die", form: "sterben", past: "ist gestorben" },
+    { en: "disturb", form: "stören", past: "hat gestört" },
+    { en: "study", form: "studieren", past: "hat studiert" },
+    { en: "search", form: "suchen", past: "hat gesucht" },
+    { en: "surf", form: "surfen", past: "hat / ist gesurft" },
+    { en: "dance", form: "tanzen", past: "hat getanzt" },
+    { en: "resist", form: "widerstehen", past: "hat widerstanden" },
+    { en: "share", form: "teilen", past: "hat geteilt" },
+    { en: "phone", form: "telefonieren", past: "hat telefoniert" },
+    { en: "wear / carry", form: "tragen", past: "hat getragen" },
+    { en: "train", form: "trainieren", past: "hat trainiert" },
+    { en: "dream", form: "träumen", past: "hat geträumt" },
+    { en: "meet", form: "treffen", past: "hat getroffen" },
+    { en: "drink", form: "trinken", past: "hat getrunken" },
+    { en: "do", form: "tun", past: "hat getan" },
+    { en: "stay overnight", form: "übernachten", past: "hat übernachtet" },
+    { en: "translate", form: "übersetzen", past: "hat übersetzt" },
+    { en: "transfer (money)", form: "überweisen", past: "hat überwiesen" },
+    { en: "change trains", form: "umsteigen", past: "ist umgestiegen" },
+    { en: "move (house)", form: "umziehen", past: "ist umgezogen" },
+    { en: "undertake / do", form: "unternehmen", past: "hat unternommen" },
+    { en: "sign", form: "unterschreiben", past: "hat unterschrieben" },
+    { en: "investigate / examine", form: "untersuchen", past: "hat untersucht" },
+    { en: "earn", form: "verdienen", past: "hat verdient" },
+    { en: "schedule / agree", form: "vereinbaren", past: "hat vereinbart" },
+    { en: "leave / abandon", form: "verlassen", past: "hat verlassen" },
+    { en: "forget", form: "vergessen", past: "hat vergessen" },
+    { en: "compare", form: "vergleichen", past: "hat verglichen" },
+    { en: "sell", form: "verkaufen", past: "hat verkauft" },
+    { en: "lose", form: "verlieren", past: "hat verloren" },
+    { en: "rent out (as landlord)", form: "vermieten", past: "hat vermietet" },
+    { en: "miss (chance/bus)", form: "verpassen", past: "hat verpasst" },
+    { en: "miss (person)", form: "vermissen", past: "hat vermisst" },
+    { en: "travel (away)", form: "verreisen", past: "ist verreist" },
+    { en: "turn", form: "drehen", past: "hat gedreht" },
+    { en: "postpone", form: "verschieben", past: "hat verschoben" },
+    { en: "understand", form: "verstehen", past: "hat verstanden" },
+    { en: "try / attempt", form: "versuchen", past: "hat versucht" },
+    { en: "wander / hike", form: "wandern", past: "ist gewandert" },
+    { en: "choose", form: "wählen", past: "hat gewählt" },
+    { en: "wait", form: "warten", past: "hat gewartet" },
+    { en: "practise", form: "üben", past: "hat geübt" },
+    { en: "change / swap", form: "wechseln", past: "hat gewechselt" },
+    { en: "wake (someone)", form: "wecken", past: "hat geweckt" },
+    { en: "repeat", form: "wiederholen", past: "hat wiederholt" },
+    { en: "want", form: "wollen", past: "hat gewollt" },
+    { en: "pay (sum)", form: "zahlen", past: "hat gezahlt" },
+    { en: "draw", form: "zeichnen", past: "hat gezeichnet" },
+    { en: "show", form: "zeigen", past: "hat gezeigt" },
+    { en: "laugh", form: "lachen", past: "hat gelacht" },
+    { en: "jog", form: "joggen", past: "hat / ist gejoggt" },
+    { en: "speak", form: "sprechen", past: "hat gesprochen" },
+    { en: "shower", form: "duschen", past: "hat geduscht" },
+    { en: "cry", form: "weinen", past: "hat geweint" },
+    { en: "live / reside", form: "wohnen", past: "hat gewohnt" },
+    { en: "know (facts)", form: "wissen", past: "hat gewusst" },
+    { en: "forgive (person)", form: "verzeihen", past: "hat verziehen" },
+    { en: "forgive (mistake)", form: "vergeben", past: "hat vergeben" },
+    { en: "enter", form: "betreten", past: "hat betreten" },
+    { en: "promise", form: "versprechen", past: "hat versprochen" },
+    { en: "be there", form: "dabei sein", past: "ist dabei gewesen" },
+    { en: "have a cold", form: "erkältet sein", past: "ist erkältet gewesen" },
+    { en: "be valid", form: "gültig sein", past: "ist gültig gewesen" },
+    { en: "be fit", form: "fit sein", past: "ist fit gewesen" },
+    { en: "be ready", form: "fertig sein", past: "ist fertig gewesen" },
+    { en: "agree", form: "einverstanden sein", past: "ist einverstanden gewesen" },
+    { en: "be allowed", form: "erlaubt sein", past: "ist erlaubt gewesen" },
+    { en: "be travelling", form: "unterwegs sein", past: "ist unterwegs gewesen" },
+    { en: "grow", form: "wachsen", past: "ist gewachsen" },
+    { en: "surprise", form: "überraschen", past: "hat überrascht" },
+    { en: "establish a connection", form: "Verbindung herstellen", past: "hat Verbindung hergestellt" }
+];
+
+const A2_REFLEXIVE = [
+    { en: "thank (oneself)", form: "sich bedanken", past: "hat sich bedankt" },
+    { en: "hurry up", form: "sich beeilen", past: "hat sich beeilt" },
+    { en: "complain", form: "sich beschweren", past: "hat sich beschwert" },
+    { en: "apply (for a job)", form: "sich bewerben", past: "hat sich beworben" },
+    { en: "excuse oneself", form: "sich entschuldigen", past: "hat sich entschuldigt" },
+    { en: "remember", form: "sich erinnern", past: "hat sich erinnert" },
+    { en: "look forward to", form: "sich freuen", past: "hat sich gefreut" },
+    { en: "feel", form: "sich fühlen", past: "hat sich gefühlt" },
+    { en: "inform oneself (about)", form: "sich informieren über", past: "hat sich informiert" },
+    { en: "be interested (in)", form: "sich interessieren", past: "hat sich interessiert" },
+    { en: "take care (of)", form: "sich kümmern", past: "hat sich gekümmert" },
+    { en: "cut oneself", form: "sich schneiden", past: "hat sich geschnitten" },
+    { en: "sit down", form: "sich setzen", past: "hat sich gesetzt" },
+    { en: "converse / chat", form: "sich unterhalten", past: "hat sich unterhalten" },
+    { en: "be annoyed", form: "sich ärgern", past: "hat sich geärgert" },
+    { en: "hurt oneself", form: "sich verletzen", past: "hat sich verletzt" },
+    { en: "fall in love", form: "sich verlieben", past: "hat sich verliebt" },
+    { en: "quarrel / argue", form: "sich streiten", past: "hat sich gestritten" },
+    { en: "wash oneself", form: "sich waschen", past: "hat sich gewaschen" },
+    { en: "meet (each other)", form: "sich treffen", past: "hat sich getroffen" },
+    { en: "introduce oneself", form: "sich vorstellen", past: "hat sich vorgestellt" }
+];
+
+const A2_TRENNBAR = [
+    { en: "deliver / hand in", form: "abgeben", past: "hat abgegeben" },
+    { en: "pick up", form: "abholen", past: "hat abgeholt" },
+    { en: "lock", form: "abschließen", past: "hat abgeschlossen" },
+    { en: "offer", form: "anbieten", past: "hat angeboten" },
+    { en: "start (TV / begin)", form: "anfangen", past: "hat angefangen" },
+    { en: "arrive", form: "ankommen", past: "ist angekommen" },
+    { en: "turn on", form: "anmachen", past: "hat angemacht" },
+    { en: "register (oneself)", form: "anmelden (sich)", past: "hat angemeldet" },
+    { en: "call (phone)", form: "anrufen", past: "hat angerufen" },
+    { en: "look at / view", form: "ansehen", past: "hat angesehen" },
+    { en: "stop / cease", form: "aufhören", past: "hat aufgehört" },
+    { en: "open (up)", form: "aufmachen", past: "hat aufgemacht" },
+    { en: "close (up)", form: "zumachen", past: "hat zugemacht" },
+    { en: "pay attention", form: "aufpassen", past: "hat aufgepasst" },
+    { en: "tidy up", form: "aufräumen", past: "hat aufgeräumt" },
+    { en: "get up", form: "aufstehen", past: "ist aufgestanden" },
+    { en: "wake up", form: "aufwachen", past: "ist aufgewacht" },
+    { en: "fill in", form: "ausfüllen", past: "hat ausgefüllt" },
+    { en: "spend (money)", form: "ausgeben", past: "hat ausgegeben" },
+    { en: "plan / intend", form: "vorhaben", past: "hat vorgehabt" },
+    { en: "turn off", form: "ausmachen", past: "hat ausgemacht" },
+    { en: "unpack", form: "auspacken", past: "hat ausgepackt" },
+    { en: "rest", form: "ausruhen (sich)", past: "hat ausgeruht" },
+    { en: "look / appear", form: "aussehen", past: "hat ausgesehen" },
+    { en: "pronounce", form: "aussprechen", past: "hat ausgesprochen" },
+    { en: "get off / exit", form: "aussteigen", past: "ist ausgestiegen" },
+    { en: "carry out", form: "austragen", past: "hat ausgetragen" },
+    { en: "go out", form: "ausgehen", past: "ist ausgegangen" },
+    { en: "shop / go shopping", form: "einkaufen", past: "hat eingekauft" },
+    { en: "invite", form: "einladen", past: "hat eingeladen" },
+    { en: "pack (in)", form: "einpacken", past: "hat eingepackt" },
+    { en: "get on / board", form: "einsteigen", past: "ist eingestiegen" },
+    { en: "register / enter (oneself)", form: "eintragen (sich)", past: "hat eingetragen" },
+    { en: "move in", form: "einziehen", past: "ist eingezogen" },
+    { en: "depart / leave", form: "(ab)fahren", past: "ist (ab)gefahren" },
+    { en: "watch TV", form: "fernsehen", past: "hat ferngesehen" },
+    { en: "fly (off)", form: "(ab)fliegen", past: "ist (ab)geflogen" },
+    { en: "ask questions", form: "Fragen stellen", past: "hat Fragen gestellt" },
+    { en: "go for a walk", form: "spazieren gehen", past: "ist spazieren gegangen" },
+    { en: "take place", form: "stattfinden", past: "hat stattgefunden" },
+    { en: "exchange", form: "(aus)tauschen", past: "hat (aus)getauscht" },
+    { en: "participate", form: "teilnehmen", past: "hat teilgenommen" },
+    { en: "change (clothes) / move", form: "umziehen (sich)", past: "hat sich umgezogen" },
+    { en: "turn (vehicle)", form: "abbiegen", past: "ist abgebogen" },
+    { en: "prepare", form: "vorbereiten", past: "hat vorbereitet" },
+    { en: "introduce (oneself)", form: "vorstellen (sich)", past: "hat vorgestellt" },
+    { en: "bring along", form: "mitbringen", past: "hat mitgebracht" },
+    { en: "come along", form: "mitkommen", past: "ist mitgekommen" },
+    { en: "take along", form: "mitnehmen", past: "hat mitgenommen" },
+    { en: "sing along", form: "mitsingen", past: "hat mitgesungen" },
+    { en: "join in / participate", form: "mitmachen", past: "hat mitgemacht" },
+    { en: "take away / bring out", form: "wegbringen", past: "hat weggebracht" },
+    { en: "drive away", form: "wegfahren", past: "ist weggefahren" },
+    { en: "go away", form: "weggehen", past: "ist weggegangen" },
+    { en: "throw away", form: "wegwerfen", past: "hat weggeworfen" },
+    { en: "take away", form: "wegnehmen", past: "hat weggenommen" },
+    { en: "run away", form: "weglaufen", past: "ist weggelaufen" },
+    { en: "give back", form: "zurückgeben", past: "hat zurückgegeben" },
+    { en: "come back", form: "zurückkommen", past: "ist zurückgekommen" },
+    { en: "bring back", form: "zurückbringen", past: "hat zurückgebracht" },
+    { en: "drive back", form: "zurückfahren", past: "ist zurückgefahren" },
+    { en: "go back", form: "zurückgehen", past: "ist zurückgegangen" },
+    { en: "put on / take off (clothes)", form: "(an-/aus)ziehen", past: "hat/ist (an/aus)gezogen" },
+    { en: "hurt", form: "wehtun", past: "hat wehgetan" }
+];
+
+const A2_ADJ = [
+    { cat: "1. Personality Traits", en: "active", de: "aktiv" },
+    { cat: "1. Personality Traits", en: "arrogant", de: "arrogant" },
+    { cat: "1. Personality Traits", en: "talented", de: "begabt" },
+    { cat: "1. Personality Traits", en: "stupid", de: "blöd" },
+    { cat: "1. Personality Traits", en: "evil", de: "böse" },
+    { cat: "1. Personality Traits", en: "dumb", de: "dumm" },
+    { cat: "1. Personality Traits", en: "honest", de: "ehrlich" },
+    { cat: "1. Personality Traits", en: "lazy", de: "faul" },
+    { cat: "1. Personality Traits", en: "diligent", de: "fleißig" },
+    { cat: "1. Personality Traits", en: "friendly", de: "freundlich" },
+    { cat: "1. Personality Traits", en: "helpful", de: "hilfsbereit" },
+    { cat: "1. Personality Traits", en: "polite", de: "höflich" },
+    { cat: "1. Personality Traits", en: "smart", de: "klug" },
+    { cat: "1. Personality Traits", en: "brave", de: "mutig" },
+    { cat: "1. Personality Traits", en: "nice", de: "nett" },
+    { cat: "1. Personality Traits", en: "shy", de: "schüchtern" },
+    { cat: "1. Personality Traits", en: "confident", de: "selbstbewusst" },
+    { cat: "1. Personality Traits", en: "sporty", de: "sportlich" },
+    { cat: "1. Personality Traits", en: "strict", de: "streng" },
+    { cat: "1. Personality Traits", en: "likeable", de: "sympathisch" },
+    { cat: "1. Personality Traits", en: "careful", de: "vorsichtig" },
+    { cat: "1. Personality Traits", en: "important", de: "wichtig" },
+    { cat: "1. Personality Traits", en: "witty", de: "witzig" },
+    { cat: "1. Personality Traits", en: "reliable", de: "zuverlässig" },
+    { cat: "1. Personality Traits", en: "direct", de: "direkt" },
+    { cat: "1. Personality Traits", en: "exact", de: "genau" },
+    { cat: "1. Personality Traits", en: "correct", de: "richtig" },
+    { cat: "2. Emotions/Feelings", en: "excited", de: "aufgeregt" },
+    { cat: "2. Emotions/Feelings", en: "happy / glad", de: "froh" },
+    { cat: "2. Emotions/Feelings", en: "happy", de: "glücklich" },
+    { cat: "2. Emotions/Feelings", en: "hearty", de: "herzlich" },
+    { cat: "2. Emotions/Feelings", en: "boring", de: "langweilig" },
+    { cat: "2. Emotions/Feelings", en: "funny", de: "lustig" },
+    { cat: "2. Emotions/Feelings", en: "tired", de: "müde" },
+    { cat: "2. Emotions/Feelings", en: "nervous", de: "nervös" },
+    { cat: "2. Emotions/Feelings", en: "romantic", de: "romantisch" },
+    { cat: "2. Emotions/Feelings", en: "stressful", de: "stressig" },
+    { cat: "2. Emotions/Feelings", en: "sad", de: "traurig" },
+    { cat: "2. Emotions/Feelings", en: "content", de: "zufrieden" },
+    { cat: "2. Emotions/Feelings", en: "hopeful", de: "zuversichtlich" },
+    { cat: "2. Emotions/Feelings", en: "disappointed", de: "enttäuscht" },
+    { cat: "2. Emotions/Feelings", en: "upset / annoyed", de: "verärgert" },
+    { cat: "3. Physical Attributes", en: "old", de: "alt" },
+    { cat: "3. Physical Attributes", en: "attractive", de: "attraktiv" },
+    { cat: "3. Physical Attributes", en: "bare", de: "bar" },
+    { cat: "3. Physical Attributes", en: "blonde", de: "blond" },
+    { cat: "3. Physical Attributes", en: "colorful", de: "bunt" },
+    { cat: "3. Physical Attributes", en: "thick / fat", de: "dick" },
+    { cat: "3. Physical Attributes", en: "dark", de: "dunkel" },
+    { cat: "3. Physical Attributes", en: "thin", de: "dünn" },
+    { cat: "3. Physical Attributes", en: "narrow / tight", de: "eng" },
+    { cat: "3. Physical Attributes", en: "fat / greasy", de: "fett" },
+    { cat: "3. Physical Attributes", en: "big / tall", de: "groß" },
+    { cat: "3. Physical Attributes", en: "hard", de: "hart" },
+    { cat: "3. Physical Attributes", en: "bright / light", de: "hell" },
+    { cat: "3. Physical Attributes", en: "ugly", de: "hässlich" },
+    { cat: "3. Physical Attributes", en: "pretty", de: "hübsch" },
+    { cat: "3. Physical Attributes", en: "small / short", de: "klein" },
+    { cat: "3. Physical Attributes", en: "long", de: "lang" },
+    { cat: "3. Physical Attributes", en: "modern", de: "modern" },
+    { cat: "3. Physical Attributes", en: "round", de: "rund" },
+    { cat: "3. Physical Attributes", en: "sharp / spicy", de: "scharf" },
+    { cat: "3. Physical Attributes", en: "weak", de: "schwach" },
+    { cat: "3. Physical Attributes", en: "heavy / difficult", de: "schwer" },
+    { cat: "3. Physical Attributes", en: "strong", de: "stark" },
+    { cat: "3. Physical Attributes", en: "deep", de: "tief" },
+    { cat: "3. Physical Attributes", en: "soft", de: "weich" },
+    { cat: "3. Physical Attributes", en: "high / tall", de: "hoch" },
+    { cat: "4. Health/Condition", en: "healthy", de: "gesund" },
+    { cat: "4. Health/Condition", en: "broken", de: "kaputt" },
+    { cat: "4. Health/Condition", en: "sick", de: "krank" },
+    { cat: "4. Health/Condition", en: "wet", de: "nass" },
+    { cat: "4. Health/Condition", en: "pregnant", de: "schwanger" },
+    { cat: "4. Health/Condition", en: "dead", de: "tot" },
+    { cat: "4. Health/Condition", en: "dry", de: "trocken" },
+    { cat: "4. Health/Condition", en: "full", de: "voll" },
+    { cat: "5. States/Status", en: "unemployed", de: "arbeitslos" },
+    { cat: "5. States/Status", en: "busy", de: "beschäftigt" },
+    { cat: "5. States/Status", en: "single", de: "einzel" },
+    { cat: "5. States/Status", en: "free", de: "frei" },
+    { cat: "5. States/Status", en: "voluntary", de: "freiwillig" },
+    { cat: "5. States/Status", en: "born", de: "geboren" },
+    { cat: "5. States/Status", en: "honored", de: "geehrte" },
+    { cat: "5. States/Status", en: "open", de: "offen" },
+    { cat: "5. States/Status", en: "private", de: "privat" },
+    { cat: "5. States/Status", en: "online", de: "online" },
+    { cat: "6. Time-Related", en: "urgent", de: "eilig" },
+    { cat: "6. Time-Related", en: "last", de: "letzt" },
+    { cat: "6. Time-Related", en: "new", de: "neu" },
+    { cat: "6. Time-Related", en: "late", de: "spät" },
+    { cat: "6. Time-Related", en: "current", de: "aktuell" },
+    { cat: "6. Time-Related", en: "early", de: "früh" },
+    { cat: "6. Time-Related", en: "immediately", de: "gleich" },
+    { cat: "7. Sensory", en: "bitter", de: "bitter" },
+    { cat: "7. Sensory", en: "cold", de: "kalt" },
+    { cat: "7. Sensory", en: "cool", de: "kühl" },
+    { cat: "7. Sensory", en: "loud", de: "laut" },
+    { cat: "7. Sensory", en: "quiet", de: "leise" },
+    { cat: "7. Sensory", en: "sour", de: "sauer" },
+    { cat: "7. Sensory", en: "sweet", de: "süß" },
+    { cat: "7. Sensory", en: "warm", de: "warm" },
+    { cat: "7. Sensory", en: "windy", de: "windig" },
+    { cat: "8. Social/Relational", en: "known", de: "bekannt" },
+    { cat: "8. Social/Relational", en: "famous", de: "berühmt" },
+    { cat: "8. Social/Relational", en: "united", de: "einig" },
+    { cat: "8. Social/Relational", en: "foreign / strange", de: "fremd" },
+    { cat: "8. Social/Relational", en: "international", de: "international" },
+    { cat: "8. Social/Relational", en: "male", de: "männlich" },
+    { cat: "8. Social/Relational", en: "female", de: "weiblich" },
+    { cat: "8. Social/Relational", en: "welcome", de: "willkommen" },
+    { cat: "9. Weather", en: "cloudy", de: "bewölkt" },
+    { cat: "9. Weather", en: "foggy", de: "neblig" },
+    { cat: "9. Weather", en: "sunny", de: "sonnig" },
+    { cat: "10. Economic/Financial", en: "poor", de: "arm" },
+    { cat: "10. Economic/Financial", en: "cheap", de: "billig" },
+    { cat: "10. Economic/Financial", en: "affordable", de: "günstig" },
+    { cat: "10. Economic/Financial", en: "free (no cost)", de: "kostenlos" },
+    { cat: "10. Economic/Financial", en: "affordable / good value", de: "preiswert" },
+    { cat: "10. Economic/Financial", en: "rich", de: "reich" },
+    { cat: "10. Economic/Financial", en: "expensive", de: "teuer" },
+    { cat: "11. Direction/Position", en: "left", de: "links" },
+    { cat: "11. Direction/Position", en: "right", de: "rechts" },
+    { cat: "11. Direction/Position", en: "far", de: "weit" },
+    { cat: "12. Evaluation/Judgment", en: "fantastic", de: "fantastisch" },
+    { cat: "12. Evaluation/Judgment", en: "awful", de: "furchtbar" },
+    { cat: "12. Evaluation/Judgment", en: "good", de: "gut" },
+    { cat: "12. Evaluation/Judgment", en: "interesting", de: "interessant" },
+    { cat: "12. Evaluation/Judgment", en: "weird / funny", de: "komisch" },
+    { cat: "12. Evaluation/Judgment", en: "possible", de: "möglich" },
+    { cat: "12. Evaluation/Judgment", en: "normal", de: "normal" },
+    { cat: "12. Evaluation/Judgment", en: "useful", de: "nützlich" },
+    { cat: "12. Evaluation/Judgment", en: "practical", de: "praktisch" },
+    { cat: "12. Evaluation/Judgment", en: "bad", de: "schlecht" },
+    { cat: "12. Evaluation/Judgment", en: "terrible / bad", de: "schlimm" },
+    { cat: "12. Evaluation/Judgment", en: "horrible", de: "schrecklich" },
+    { cat: "12. Evaluation/Judgment", en: "beautiful", de: "schön" },
+    { cat: "12. Evaluation/Judgment", en: "exciting", de: "spannend" },
+    { cat: "12. Evaluation/Judgment", en: "great", de: "toll" },
+    { cat: "12. Evaluation/Judgment", en: "typical", de: "typisch" },
+    { cat: "12. Evaluation/Judgment", en: "important", de: "wichtig" },
+    { cat: "12. Evaluation/Judgment", en: "wonderful", de: "wunderbar" },
+    { cat: "13. Function/Utility", en: "dangerous", de: "gefährlich" },
+    { cat: "13. Function/Utility", en: "written", de: "schriftlich" },
+    { cat: "13. Function/Utility", en: "harmful", de: "schädlich" },
+    { cat: "13. Function/Utility", en: "automatic", de: "automatisch" },
+    { cat: "13. Function/Utility", en: "clear / distinct", de: "deutlich" },
+    { cat: "13. Function/Utility", en: "urgent", de: "dringend" },
+    { cat: "13. Function/Utility", en: "simple / easy", de: "einfach" },
+    { cat: "13. Function/Utility", en: "clear", de: "klar" },
+    { cat: "13. Function/Utility", en: "safe / sure", de: "sicher" },
+    { cat: "14. Miscellaneous", en: "better", de: "besser" },
+    { cat: "14. Miscellaneous", en: "short", de: "kurz" },
+    { cat: "14. Miscellaneous", en: "slow", de: "langsam" },
+    { cat: "14. Miscellaneous", en: "punctual", de: "pünktlich" },
+    { cat: "14. Miscellaneous", en: "fast", de: "schnell" },
+    { cat: "14. Miscellaneous", en: "difficult", de: "schwierig" },
+    { cat: "14. Miscellaneous", en: "different / various", de: "verschieden" },
+    { cat: "14. Miscellaneous", en: "awake", de: "wach" },
+    { cat: "14. Miscellaneous", en: "true", de: "wahr" },
+    { cat: "14. Miscellaneous", en: "quiet / calm", de: "ruhig" },
+    { cat: "14. Miscellaneous", en: "of course / naturally", de: "natürlich" },
+    { cat: "14. Miscellaneous", en: "lonely", de: "einsam" },
+    { cat: "14. Miscellaneous", en: "different / other", de: "andere" },
+    { cat: "14. Miscellaneous", en: "own", de: "eigene" },
+    { cat: "15. Degree/Intensity", en: "especially", de: "besonders" },
+    { cat: "15. Degree/Intensity", en: "entirely / quite", de: "ganz" },
+    { cat: "15. Degree/Intensity", en: "enough", de: "genug" },
+    { cat: "15. Degree/Intensity", en: "more", de: "mehr" },
+    { cat: "15. Degree/Intensity", en: "totally", de: "total" },
+    { cat: "15. Degree/Intensity", en: "much", de: "viel" },
+    { cat: "15. Degree/Intensity", en: "little / few", de: "wenig" },
+    { cat: "15. Degree/Intensity", en: "really / genuine", de: "echt" },
+    { cat: "Adverbs: Time", en: "soon", de: "bald" },
+    { cat: "Adverbs: Time", en: "back then", de: "damals" },
+    { cat: "Adverbs: Time", en: "finally", de: "endlich" },
+    { cat: "Adverbs: Time", en: "first / only", de: "erst" },
+    { cat: "Adverbs: Time", en: "just / straight", de: "gerade" },
+    { cat: "Adverbs: Time", en: "yesterday", de: "gestern" },
+    { cat: "Adverbs: Time", en: "today", de: "heute" },
+    { cat: "Adverbs: Time", en: "now", de: "jetzt" },
+    { cat: "Adverbs: Time", en: "tomorrow", de: "morgen" },
+    { cat: "Adverbs: Time", en: "still / yet", de: "noch" },
+    { cat: "Adverbs: Time", en: "already", de: "schon" },
+    { cat: "Adverbs: Time", en: "immediately", de: "sofort" },
+    { cat: "Adverbs: Time", en: "later", de: "später" },
+    { cat: "Adverbs: Time", en: "past / over", de: "vorbei" },
+    { cat: "Adverbs: Time", en: "day before yesterday", de: "vorgestern" },
+    { cat: "Adverbs: Time", en: "before / previously", de: "vorher" },
+    { cat: "Adverbs: Time", en: "again", de: "wieder" },
+    { cat: "Adverbs: Time", en: "first (of all)", de: "zuerst" },
+    { cat: "Adverbs: Time", en: "last / finally", de: "zuletzt" },
+    { cat: "Adverbs: Time", en: "day after tomorrow", de: "übermorgen" },
+    { cat: "Adverbs: Frequency", en: "always", de: "immer" },
+    { cat: "Adverbs: Frequency", en: "sometimes", de: "manchmal" },
+    { cat: "Adverbs: Frequency", en: "mostly", de: "meistens" },
+    { cat: "Adverbs: Frequency", en: "never", de: "nie" },
+    { cat: "Adverbs: Frequency", en: "often", de: "oft" },
+    { cat: "Adverbs: Frequency", en: "once", de: "einmal" },
+    { cat: "Adverbs: Location", en: "next to", de: "daneben" },
+    { cat: "Adverbs: Location", en: "there", de: "dort" },
+    { cat: "Adverbs: Location", en: "outside", de: "draußen" },
+    { cat: "Adverbs: Location", en: "inside", de: "drinnen" },
+    { cat: "Adverbs: Location", en: "over there", de: "drüben" },
+    { cat: "Adverbs: Location", en: "here", de: "hier" },
+    { cat: "Adverbs: Location", en: "back there / behind", de: "hinten" },
+    { cat: "Adverbs: Location", en: "next door", de: "nebenan" },
+    { cat: "Adverbs: Location", en: "nowhere", de: "nirgends" },
+    { cat: "Adverbs: Location", en: "upstairs / above", de: "oben" },
+    { cat: "Adverbs: Location", en: "downstairs / below", de: "unten" },
+    { cat: "Adverbs: Location", en: "front", de: "vorn" },
+    { cat: "Adverbs: Location", en: "forward", de: "vorwärts" },
+    { cat: "Adverbs: Location", en: "further / continue", de: "weiter" },
+    { cat: "Adverbs: Location", en: "back", de: "zurück" },
+    { cat: "Adverbs: Location", en: "everywhere", de: "überall" },
+    { cat: "Adverbs: Location", en: "straight ahead", de: "geradeaus" },
+    { cat: "Adverbs: Location", en: "in here", de: "herein" },
+    { cat: "Adverbs: Degree", en: "a bit", de: "bisschen" },
+    { cat: "Adverbs: Degree", en: "almost", de: "fast" },
+    { cat: "Adverbs: Degree", en: "at least", de: "mindestens" },
+    { cat: "Adverbs: Degree", en: "only", de: "nur" },
+    { cat: "Adverbs: Degree", en: "very", de: "sehr" },
+    { cat: "Adverbs: Degree", en: "even", de: "sogar" },
+    { cat: "Adverbs: Degree", en: "absolutely / definitely", de: "unbedingt" },
+    { cat: "Adverbs: Degree", en: "at least", de: "wenigstens" },
+    { cat: "Adverbs: Degree", en: "really", de: "wirklich" },
+    { cat: "Adverbs: Degree", en: "a few", de: "ein paar" },
+    { cat: "Adverbs: Manner", en: "suddenly", de: "plötzlich" },
+    { cat: "Adverbs: Manner", en: "together", de: "zusammen" },
+    { cat: "Adverbs: Manner", en: "actually", de: "eigentlich" },
+    { cat: "Adverbs: Manner", en: "gladly", de: "gern" },
+    { cat: "Adverbs: Manner", en: "rather / preferably", de: "lieber" },
+    { cat: "Adverbs: Manner", en: "additionally", de: "außerdem" },
+    { cat: "Adverbs: Probability", en: "hopefully", de: "hoffentlich" },
+    { cat: "Adverbs: Probability", en: "maybe", de: "vielleicht" },
+    { cat: "Adverbs: Probability", en: "probably", de: "wahrscheinlich" },
+    { cat: "Adverbs: Affirmation/Negation", en: "also / too", de: "auch" },
+    { cat: "Adverbs: Affirmation/Negation", en: "unfortunately", de: "leider" },
+    { cat: "Adverbs: Affirmation/Negation", en: "not", de: "nicht" },
+    { cat: "Adverbs: Affirmation/Negation", en: "no matter", de: "egal" },
+    { cat: "Adverbs: Miscellaneous", en: "otherwise", de: "sonst" },
+    { cat: "Adverbs: Miscellaneous", en: "unfortunate / a pity", de: "schade" },
+    { cat: "Adverbs: Miscellaneous", en: "super", de: "super" },
+    { cat: "Others: Particles", en: "thus, so, therefore", de: "also" },
+    { cat: "Others: Particles", en: "but, however, still", de: "doch" },
+    { cat: "Others: Particles", en: "so, like this", de: "so" },
+    { cat: "Others: Particles", en: "best", de: "am besten" },
+    { cat: "Others: Particles", en: "most preferably", de: "am liebsten" },
+    { cat: "Others: Particles", en: "fastest", de: "am schnellsten" },
+    { cat: "Others: Particles", en: "in any case, definitely", de: "auf jeden Fall" },
+    { cat: "Others: Particles", en: "under no circumstances", de: "keinen Fall" },
+    { cat: "Others: Particles", en: "for example", de: "zum Beispiel" },
+    { cat: "Others: Conjunctions", en: "but", de: "aber" },
+    { cat: "Others: Conjunctions", en: "than, as", de: "als" },
+    { cat: "Others: Conjunctions", en: "or", de: "oder" },
+    { cat: "Others: Conjunctions", en: "but rather", de: "sondern" },
+    { cat: "Others: Conjunctions", en: "if / when", de: "wenn" },
+    { cat: "Others: Conjunctions", en: "then", de: "dann" },
+    { cat: "Others: Conjunctions", en: "that", de: "dass" },
+    { cat: "Others: Conjunctions", en: "because", de: "denn" },
+    { cat: "Others: Conjunctions", en: "therefore", de: "deshalb" },
+    { cat: "Others: Conjunctions", en: "because", de: "weil" },
+    { cat: "Others: Conjunctions", en: "whether", de: "ob" },
+    { cat: "Others: Conjunctions", en: "although", de: "obwohl" },
+    { cat: "Others: Conjunctions", en: "and", de: "und" },
+    { cat: "Others: Politeness", en: "please", de: "bitte" },
+    { cat: "Others: Politeness", en: "thanks", de: "danke" },
+    { cat: "Others: Politeness", en: "hello", de: "hallo" },
+    { cat: "Others: Politeness", en: "bye", de: "tschüs" },
+    { cat: "Others: Politeness", en: "attention!", de: "Achtung" },
+    { cat: "Others: Yes/No", en: "yes", de: "ja" },
+    { cat: "Others: Yes/No", en: "no", de: "nein" },
+    { cat: "Others: Prepositions", en: "from, since", de: "ab" },
+    { cat: "Others: Prepositions", en: "until, to", de: "bis" },
+    { cat: "Others: Prepositions", en: "in, into", de: "in" },
+    { cat: "Others: Prepositions", en: "per", de: "pro" },
+    { cat: "Others: Prepositions", en: "around, at", de: "um" },
+    { cat: "Others: Prepositions", en: "because of", de: "wegen" },
+    { cat: "Others: Prepositions", en: "over, about", de: "über" },
+    { cat: "Others: Prepositions", en: "except, besides", de: "außer" },
+    { cat: "Others: Prepositions", en: "against", de: "gegen" },
+    { cat: "Others: Prepositions", en: "through", de: "durch" },
+    { cat: "Others: Prepositions", en: "for", de: "für" },
+    { cat: "Others: Prepositions", en: "without", de: "ohne" },
+    { cat: "Others: Prepositions", en: "along", de: "entlang" },
+    { cat: "Others: Pronouns", en: "someone", de: "jemand" },
+    { cat: "Others: Pronouns", en: "one, people", de: "man" },
+    { cat: "Others: Pronouns", en: "nothing", de: "nichts" },
+    { cat: "Others: Pronouns", en: "nobody", de: "niemand" },
+    { cat: "Others: Pronouns", en: "all", de: "alle" },
+    { cat: "Others: Pronouns", en: "both", de: "beide" },
+    { cat: "Others: Pronouns", en: "everyone", de: "jeder" },
+    { cat: "Others: Pronouns", en: "no, none", de: "kein" },
+    { cat: "Others: Pronouns", en: "some", de: "manch" },
+    { cat: "Others: Pronouns", en: "something", de: "etwas" },
+    { cat: "Others: Pronouns", en: "oneself", de: "selbst" },
+    { cat: "Others: Pronouns", en: "in, inside", de: "rein" },
+    { cat: "Others: Pronouns", en: "everything", de: "alles" },
+    { cat: "Question Words", en: "what", de: "Was" },
+    { cat: "Question Words", en: "who", de: "Wer" },
+    { cat: "Question Words", en: "whom", de: "Wen" },
+    { cat: "Question Words", en: "to whom", de: "Wem" },
+    { cat: "Question Words", en: "whose", de: "Wessen" },
+    { cat: "Question Words", en: "where", de: "Wo" },
+    { cat: "Question Words", en: "where to", de: "Wohin" },
+    { cat: "Question Words", en: "where from", de: "Woher" },
+    { cat: "Question Words", en: "when", de: "Wann" },
+    { cat: "Question Words", en: "how", de: "Wie" },
+    { cat: "Question Words", en: "why", de: "Warum" },
+    { cat: "Question Words", en: "why (how come)", de: "Wieso" },
+    { cat: "Question Words", en: "why (for what reason)", de: "Weshalb" },
+    { cat: "Question Words", en: "for what", de: "Wofür" },
+    { cat: "Question Words", en: "with what", de: "Womit" },
+    { cat: "Question Words", en: "about what", de: "Woran" },
+    { cat: "Question Words", en: "about what", de: "Worüber" },
+    { cat: "Question Words", en: "how much", de: "Wieviel" },
+    { cat: "Question Words", en: "how many", de: "Wie viele" },
+    { cat: "Miscellaneous Words", en: "holiday (from work)", de: "Feierabend" },
+    { cat: "Miscellaneous Words", en: "public holiday", de: "Feiertag" },
+    { cat: "Miscellaneous Words", en: "early / in the past", de: "früher" },
+    { cat: "Miscellaneous Words", en: "young", de: "jung" },
+    { cat: "Miscellaneous Words", en: "favorite", de: "Lieblings-" },
+    { cat: "Miscellaneous Words", en: "necessary", de: "notwendig" },
+    { cat: "Miscellaneous Words", en: "next", de: "nächste" },
+    { cat: "Miscellaneous Words", en: "angry", de: "wutend" },
+    { cat: "Miscellaneous Words", en: "near", de: "nahe / in der Nähe" }
+];
+
+const A2_NOUNS = [
+    { article: "der", en: "beginning", de: "der Anfang" },
+    { article: "der", en: "phone call", de: "der Anruf" },
+    { article: "der", en: "connection", de: "der Anschluss" },
+    { article: "der", en: "suit", de: "der Anzug" },
+    { article: "der", en: "apple", de: "der Apfel" },
+    { article: "der", en: "apparatus", de: "der Apparat" },
+    { article: "der", en: "arm", de: "der Arm" },
+    { article: "der", en: "article", de: "der Artikel" },
+    { article: "der", en: "elevator", de: "der Aufzug" },
+    { article: "der", en: "outing", de: "der Ausflug" },
+    { article: "der", en: "exit", de: "der Ausgang" },
+    { article: "der", en: "ID card", de: "der Ausweis" },
+    { article: "der", en: "machine", de: "der Automat" },
+    { article: "der", en: "babysitter", de: "der Babysitter" },
+    { article: "der", en: "train station", de: "der Bahnhof" },
+    { article: "der", en: "platform", de: "der Bahnsteig" },
+    { article: "der", en: "balcony", de: "der Balkon" },
+    { article: "der", en: "ball", de: "der Ball" },
+    { article: "der", en: "basketball", de: "der Basketball" },
+    { article: "der", en: "stomach", de: "der Bauch" },
+    { article: "der", en: "tree", de: "der Baum" },
+    { article: "der", en: "mountain", de: "der Berg" },
+    { article: "der", en: "profession", de: "der Beruf" },
+    { article: "der", en: "notice / notification", de: "der Bescheid" },
+    { article: "der", en: "visit", de: "der Besuch" },
+    { article: "der", en: "pencil", de: "der Bleistift" },
+    { article: "der", en: "letter", de: "der Brief" },
+    { article: "der", en: "letter (character)", de: "der Buchstabe" },
+    { article: "der", en: "bus", de: "der Bus" },
+    { article: "der", en: "boss", de: "der Chef" },
+    { article: "der", en: "club", de: "der Club" },
+    { article: "der", en: "computer", de: "der Computer" },
+    { article: "der", en: "thanks", de: "der Dank" },
+    { article: "der", en: "printer", de: "der Drucker" },
+    { article: "der", en: "thirst", de: "der Durst" },
+    { article: "der", en: "husband", de: "der Ehemann" },
+    { article: "der", en: "spouse", de: "der Ehepartner" },
+    { article: "der", en: "entrance", de: "der Eingang" },
+    { article: "der", en: "admission", de: "der Eintritt" },
+    { article: "der", en: "recipient", de: "der Empfänger" },
+    { article: "der", en: "adult", de: "der Erwachsene" },
+    { article: "der", en: "timetable", de: "der Fahrplan" },
+    { article: "der", en: "fan", de: "der Fan" },
+    { article: "der", en: "mistake", de: "der Fehler" },
+    { article: "der", en: "television", de: "der Fernseher" },
+    { article: "der", en: "film", de: "der Film" },
+    { article: "der", en: "fish", de: "der Fisch" },
+    { article: "der", en: "flea market", de: "der Flohmarkt" },
+    { article: "der", en: "flight", de: "der Flug" },
+    { article: "der", en: "airport", de: "der Flughafen" },
+    { article: "der", en: "river", de: "der Fluss" },
+    { article: "der", en: "camera", de: "der Fotoapparat" },
+    { article: "der", en: "friend", de: "der Freund" },
+    { article: "der", en: "foot", de: "der Fuß" },
+    { article: "der", en: "soccer ball", de: "der Fußball" },
+    { article: "der", en: "garden", de: "der Garten" },
+    { article: "der", en: "guest", de: "der Gast" },
+    { article: "der", en: "greeting", de: "der Gruß" },
+    { article: "der", en: "neck", de: "der Hals" },
+    { article: "der", en: "hamburger", de: "der Hamburger" },
+    { article: "der", en: "household", de: "der Haushalt" },
+    { article: "der", en: "stove", de: "der Herd" },
+    { article: "der", en: "gentleman / Mr.", de: "der Herr" },
+    { article: "der", en: "sky / heaven", de: "der Himmel" },
+    { article: "der", en: "dog", de: "der Hund" },
+    { article: "der", en: "hunger", de: "der Hunger" },
+    { article: "der", en: "job", de: "der Job" },
+    { article: "der", en: "boy", de: "der Junge" },
+    { article: "der", en: "coffee", de: "der Kaffee" },
+    { article: "der", en: "calendar", de: "der Kalender" },
+    { article: "der", en: "cheese", de: "der Käse" },
+    { article: "der", en: "basement / cellar", de: "der Keller" },
+    { article: "der", en: "kindergarten", de: "der Kindergarten" },
+    { article: "der", en: "kiosk", de: "der Kiosk" },
+    { article: "der", en: "suitcase", de: "der Koffer" },
+    { article: "der", en: "colleague", de: "der Kollege" },
+    { article: "der", en: "contact", de: "der Kontakt" },
+    { article: "der", en: "head", de: "der Kopf" },
+    { article: "der", en: "body", de: "der Körper" },
+    { article: "der", en: "credit / loan", de: "der Kredit" },
+    { article: "der", en: "detective story", de: "der Krimi" },
+    { article: "der", en: "cake", de: "der Kuchen" },
+    { article: "der", en: "customer", de: "der Kunde" },
+    { article: "der", en: "course", de: "der Kurs" },
+    { article: "der", en: "shop", de: "der Laden" },
+    { article: "der", en: "link", de: "der Link" },
+    { article: "der", en: "spoon", de: "der Löffel" },
+    { article: "der", en: "stomach (organ)", de: "der Magen" },
+    { article: "der", en: "man", de: "der Mann" },
+    { article: "der", en: "coat", de: "der Mantel" },
+    { article: "der", en: "market", de: "der Markt" },
+    { article: "der", en: "human / person", de: "der Mensch" },
+    { article: "der", en: "employee", de: "der Mitarbeiter" },
+    { article: "der", en: "moment", de: "der Moment" },
+    { article: "der", en: "engine / motor", de: "der Motor" },
+    { article: "der", en: "scooter", de: "der Motorroller" },
+    { article: "der", en: "garbage / trash", de: "der Müll" },
+    { article: "der", en: "mouth", de: "der Mund" },
+    { article: "der", en: "neighbor", de: "der Nachbar" },
+    { article: "der", en: "name", de: "der Name" },
+    { article: "der", en: "place / location", de: "der Ort" },
+    { article: "der", en: "park", de: "der Park" },
+    { article: "der", en: "partner", de: "der Partner" },
+    { article: "der", en: "passport", de: "der Pass" },
+    { article: "der", en: "plan", de: "der Plan" },
+    { article: "der", en: "place / square", de: "der Platz" },
+    { article: "der", en: "price / prize", de: "der Preis" },
+    { article: "der", en: "brochure", de: "der Prospekt" },
+    { article: "der", en: "sweater / pullover", de: "der Pullover" },
+    { article: "der", en: "room / space", de: "der Raum" },
+    { article: "der", en: "rain", de: "der Regen" },
+    { article: "der", en: "tire", de: "der Reifen" },
+    { article: "der", en: "rice", de: "der Reis" },
+    { article: "der", en: "travel guide", de: "der Reiseführer" },
+    { article: "der", en: "rest / remainder", de: "der Rest" },
+    { article: "der", en: "ring", de: "der Ring" },
+    { article: "der", en: "skirt", de: "der Rock" },
+    { article: "der", en: "back", de: "der Rücken" },
+    { article: "der", en: "backpack", de: "der Rucksack" },
+    { article: "der", en: "tour / walk", de: "der Rundgang" },
+    { article: "der", en: "juice", de: "der Saft" },
+    { article: "der", en: "salad", de: "der Salat" },
+    { article: "der", en: "sentence", de: "der Satz" },
+    { article: "der", en: "counter / switch", de: "der Schalter" },
+    { article: "der", en: "umbrella / screen", de: "der Schirm" },
+    { article: "der", en: "conclusion / end", de: "der Schluss" },
+    { article: "der", en: "key", de: "der Schlüssel" },
+    { article: "der", en: "pain", de: "der Schmerz" },
+    { article: "der", en: "snow", de: "der Schnee" },
+    { article: "der", en: "cupboard / wardrobe", de: "der Schrank" },
+    { article: "der", en: "shoe", de: "der Schuh" },
+    { article: "der", en: "student / pupil", de: "der Schüler" },
+    { article: "der", en: "lake", de: "der See" },
+    { article: "der", en: "service", de: "der Service" },
+    { article: "der", en: "ski", de: "der Ski" },
+    { article: "der", en: "fun", de: "der Spaß" },
+    { article: "der", en: "sport", de: "der Sport" },
+    { article: "der", en: "sports field", de: "der Sportplatz" },
+    { article: "der", en: "city map", de: "der Stadtplan" },
+    { article: "der", en: "star", de: "der Star" },
+    { article: "der", en: "boot", de: "der Stiefel" },
+    { article: "der", en: "pen / pencil", de: "der Stift" },
+    { article: "der", en: "stick / floor", de: "der Stock" },
+    { article: "der", en: "beach", de: "der Strand" },
+    { article: "der", en: "stress", de: "der Stress" },
+    { article: "der", en: "university student", de: "der Student" },
+    { article: "der", en: "chair", de: "der Stuhl" },
+    { article: "der", en: "supermarket", de: "der Supermarkt" },
+    { article: "der", en: "tea", de: "der Tee" },
+    { article: "der", en: "plate", de: "der Teller" },
+    { article: "der", en: "appointment", de: "der Termin" },
+    { article: "der", en: "text", de: "der Text" },
+    { article: "der", en: "tip / hint", de: "der Tipp" },
+    { article: "der", en: "table", de: "der Tisch" },
+    { article: "der", en: "title", de: "der Titel" },
+    { article: "der", en: "pot", de: "der Topf" },
+    { article: "der", en: "tourist", de: "der Tourist" },
+    { article: "der", en: "dream", de: "der Traum" },
+    { article: "der", en: "move (relocation)", de: "der Umzug" },
+    { article: "der", en: "accident", de: "der Unfall" },
+    { article: "der", en: "lesson / class", de: "der Unterricht" },
+    { article: "der", en: "difference", de: "der Unterschied" },
+    { article: "der", en: "vacation / holiday", de: "der Urlaub" },
+    { article: "der", en: "club / association", de: "der Verein" },
+    { article: "der", en: "traffic", de: "der Verkehr" },
+    { article: "der", en: "landlord", de: "der Vermieter" },
+    { article: "der", en: "contract", de: "der Vertrag" },
+    { article: "der", en: "bird", de: "der Vogel" },
+    { article: "der", en: "volleyball", de: "der Volleyball" },
+    { article: "der", en: "first name", de: "der Vorname" },
+    { article: "der", en: "suggestion / proposal", de: "der Vorschlag" },
+    { article: "der", en: "car", de: "der Wagen" },
+    { article: "der", en: "forest", de: "der Wald" },
+    { article: "der", en: "path / way", de: "der Weg" },
+    { article: "der", en: "wine", de: "der Wein" },
+    { article: "der", en: "competition", de: "der Wettbewerb" },
+    { article: "der", en: "wind", de: "der Wind" },
+    { article: "der", en: "joke", de: "der Witz" },
+    { article: "der", en: "workshop", de: "der Workshop" },
+    { article: "der", en: "wish", de: "der Wunsch" },
+    { article: "der", en: "tooth", de: "der Zahn" },
+    { article: "der", en: "note / slip", de: "der Zettel" },
+    { article: "der", en: "circus", de: "der Zirkus" },
+    { article: "der", en: "zoo", de: "der Zoo" },
+    { article: "der", en: "sugar", de: "der Zucker" },
+    { article: "der", en: "train", de: "der Zug" },
+    { article: "der", en: "holiday (public)", de: "der Feiertag" },
+    { article: "der", en: "number", de: "der Zahl" },
+    { article: "der", en: "pensioner / retiree", de: "der Rentner" },
+    { article: "der", en: "emergency", de: "der Notfall" },
+    { article: "das", en: "age", de: "das Alter" },
+    { article: "das", en: "offer", de: "das Angebot" },
+    { article: "das", en: "eye", de: "das Auge" },
+    { article: "das", en: "abroad / foreign countries", de: "das Ausland" },
+    { article: "das", en: "car", de: "das Auto" },
+    { article: "das", en: "baby", de: "das Baby" },
+    { article: "das", en: "bath / bathroom", de: "das Bad" },
+    { article: "das", en: "leg", de: "das Bein" },
+    { article: "das", en: "bed", de: "das Bett" },
+    { article: "das", en: "beer", de: "das Bier" },
+    { article: "das", en: "picture", de: "das Bild" },
+    { article: "das", en: "leaf / sheet", de: "das Blatt" },
+    { article: "das", en: "blog", de: "das Blog" },
+    { article: "das", en: "bread", de: "das Brot" },
+    { article: "das", en: "roll (bread)", de: "das Brötchen" },
+    { article: "das", en: "book", de: "das Buch" },
+    { article: "das", en: "office", de: "das Büro" },
+    { article: "das", en: "café", de: "das Café" },
+    { article: "das", en: "comic", de: "das Comic" },
+    { article: "das", en: "date", de: "das Datum" },
+    { article: "das", en: "thing", de: "das Ding" },
+    { article: "das", en: "double room", de: "das Doppelzimmer" },
+    { article: "das", en: "village", de: "das Dorf" },
+    { article: "das", en: "e-book", de: "das E-Book" },
+    { article: "das", en: "egg", de: "das Ei" },
+    { article: "das", en: "ice cream", de: "das Eis" },
+    { article: "das", en: "end", de: "das Ende" },
+    { article: "das", en: "ground floor", de: "das Erdgeschoss" },
+    { article: "das", en: "food / meal", de: "das Essen" },
+    { article: "das", en: "subject / compartment", de: "das Fach" },
+    { article: "das", en: "bicycle", de: "das (Fahr)Rad" },
+    { article: "das", en: "window", de: "das Fenster" },
+    { article: "das", en: "festival / party", de: "das Fest" },
+    { article: "das", en: "festival", de: "das Festival" },
+    { article: "das", en: "fever", de: "das Fieber" },
+    { article: "das", en: "meat", de: "das Fleisch" },
+    { article: "das", en: "airplane", de: "das Flugzeug" },
+    { article: "das", en: "form", de: "das Formular" },
+    { article: "das", en: "photo", de: "das Foto" },
+    { article: "das", en: "breakfast", de: "das Frühstück" },
+    { article: "das", en: "opposite", de: "das Gegenteil" },
+    { article: "das", en: "salary", de: "das Gehalt" },
+    { article: "das", en: "money", de: "das Geld" },
+    { article: "das", en: "vegetables", de: "das Gemüse" },
+    { article: "das", en: "luggage", de: "das Gepäck" },
+    { article: "das", en: "device / appliance", de: "das Gerät" },
+    { article: "das", en: "dish / meal", de: "das Gericht" },
+    { article: "das", en: "store / business", de: "das Geschäft" },
+    { article: "das", en: "gift / present", de: "das Geschenk" },
+    { article: "das", en: "dishes / crockery", de: "das Geschirr" },
+    { article: "das", en: "face", de: "das Gesicht" },
+    { article: "das", en: "conversation", de: "das Gespräch" },
+    { article: "das", en: "thunderstorm", de: "das Gewitter" },
+    { article: "das", en: "glass", de: "das Glas" },
+    { article: "das", en: "platform / track", de: "das Gleis" },
+    { article: "das", en: "luck / happiness", de: "das Glück" },
+    { article: "das", en: "drink / beverage", de: "das Getränk" },
+    { article: "das", en: "hair", de: "das Haar" },
+    { article: "das", en: "towel", de: "das Handtuch" },
+    { article: "das", en: "mobile phone", de: "das Handy" },
+    { article: "das", en: "house", de: "das Haus" },
+    { article: "das", en: "notebook / booklet", de: "das Heft" },
+    { article: "das", en: "shirt", de: "das Hemd" },
+    { article: "das", en: "hobby", de: "das Hobby" },
+    { article: "das", en: "hotel", de: "das Hotel" },
+    { article: "das", en: "instrument", de: "das Instrument" },
+    { article: "das", en: "interest", de: "das Interesse" },
+    { article: "das", en: "internet", de: "das Internet" },
+    { article: "das", en: "interview", de: "das Interview" },
+    { article: "das", en: "department store", de: "das Kaufhaus" },
+    { article: "das", en: "child", de: "das Kind" },
+    { article: "das", en: "piano", de: "das Klavier" },
+    { article: "das", en: "dress", de: "das Kleid" },
+    { article: "das", en: "account", de: "das Konto" },
+    { article: "das", en: "concert", de: "das Konzert" },
+    { article: "das", en: "country", de: "das Land" },
+    { article: "das", en: "laptop", de: "das Laptop" },
+    { article: "das", en: "life", de: "das Leben" },
+    { article: "das", en: "light", de: "das Licht" },
+    { article: "das", en: "song", de: "das Lied" },
+    { article: "das", en: "pub / restaurant", de: "das Lokal" },
+    { article: "das", en: "girl", de: "das Mädchen" },
+    { article: "das", en: "medication", de: "das Medikament" },
+    { article: "das", en: "sea / ocean", de: "das Meer" },
+    { article: "das", en: "knife", de: "das Messer" },
+    { article: "das", en: "lunch", de: "das Mittagessen" },
+    { article: "das", en: "means / remedy", de: "das Mittel" },
+    { article: "das", en: "museum", de: "das Museum" },
+    { article: "das", en: "fruit", de: "das Obst" },
+    { article: "das", en: "ear", de: "das Ohr" },
+    { article: "das", en: "oil", de: "das Öl" },
+    { article: "das", en: "pair / couple", de: "das Paar" },
+    { article: "das", en: "package / parcel", de: "das Paket" },
+    { article: "das", en: "paper", de: "das Papier" },
+    { article: "das", en: "perfume", de: "das Parfüm" },
+    { article: "das", en: "password", de: "das Passwort" },
+    { article: "das", en: "horse", de: "das Pferd" },
+    { article: "das", en: "poster / placard", de: "das Plakat" },
+    { article: "das", en: "poster", de: "das Poster" },
+    { article: "das", en: "internship", de: "das Praktikum" },
+    { article: "das", en: "problem", de: "das Problem" },
+    { article: "das", en: "product", de: "das Produkt" },
+    { article: "das", en: "program", de: "das Programm" },
+    { article: "das", en: "project", de: "das Projekt" },
+    { article: "das", en: "quiz", de: "das Quiz" },
+    { article: "das", en: "radio", de: "das Radio" },
+    { article: "das", en: "town hall", de: "das Rathaus" },
+    { article: "das", en: "puzzle / riddle", de: "das Rätsel" },
+    { article: "das", en: "travel agency", de: "das Reisebüro" },
+    { article: "das", en: "restaurant", de: "das Restaurant" },
+    { article: "das", en: "recipe / prescription", de: "das Rezept" },
+    { article: "das", en: "cattle / beef", de: "das Rind" },
+    { article: "das", en: "salt", de: "das Salz" },
+    { article: "das", en: "ship", de: "das Schiff" },
+    { article: "das", en: "sign / shield", de: "das Schild" },
+    { article: "das", en: "bedroom", de: "das Schlafzimmer" },
+    { article: "das", en: "castle / lock", de: "das Schloss" },
+    { article: "das", en: "pig", de: "das Schwein" },
+    { article: "das", en: "sofa", de: "das Sofa" },
+    { article: "das", en: "game / play", de: "das Spiel" },
+    { article: "das", en: "floor / storey", de: "das Stockwerk" },
+    { article: "das", en: "piece", de: "das Stück" },
+    { article: "das", en: "studies", de: "das Studium" },
+    { article: "das", en: "tablet", de: "das Tablet" },
+    { article: "das", en: "pocket money", de: "das Taschengeld" },
+    { article: "das", en: "taxi", de: "das Taxi" },
+    { article: "das", en: "team", de: "das Team" },
+    { article: "das", en: "telephone", de: "das Telefon" },
+    { article: "das", en: "tennis", de: "das Tennis" },
+    { article: "das", en: "theater", de: "das Theater" },
+    { article: "das", en: "topic / theme", de: "das Thema" },
+    { article: "das", en: "ticket (general)", de: "das Ticket" },
+    { article: "das", en: "animal", de: "das Tier" },
+    { article: "das", en: "training", de: "das Training" },
+    { article: "das", en: "T-shirt", de: "das T-Shirt" },
+    { article: "das", en: "water", de: "das Wasser" },
+    { article: "das", en: "weather", de: "das Wetter" },
+    { article: "das", en: "goodbye (on phone)", de: "das Wiederhören" },
+    { article: "das", en: "reunion / seeing again", de: "das Wiedersehen" },
+    { article: "das", en: "word", de: "das Wort" },
+    { article: "das", en: "center", de: "das Zentrum" },
+    { article: "das", en: "report card", de: "das Zeugnis" },
+    { article: "das", en: "goal / aim", de: "das Ziel" },
+    { article: "das", en: "room", de: "das Zimmer" },
+    { article: "die", en: "address", de: "die Adresse" },
+    { article: "die", en: "idea / notion", de: "die Ahnung" },
+    { article: "die", en: "traffic light", de: "die Ampel" },
+    { article: "die", en: "fear / anxiety", de: "die Angst" },
+    { article: "die", en: "arrival", de: "die Ankunft" },
+    { article: "die", en: "registration", de: "die Anmeldung" },
+    { article: "die", en: "answer", de: "die Antwort" },
+    { article: "die", en: "advertisement", de: "die Anzeige" },
+    { article: "die", en: "work / job", de: "die Arbeit" },
+    { article: "die", en: "education / training", de: "die Ausbildung" },
+    { article: "die", en: "information (desk)", de: "die Auskunft" },
+    { article: "die", en: "exhibition", de: "die Ausstellung" },
+    { article: "die", en: "highway / motorway", de: "die Autobahn" },
+    { article: "die", en: "bakery", de: "die Bäckerei" },
+    { article: "die", en: "train / railway", de: "die Bahn" },
+    { article: "die", en: "banana", de: "die Banane" },
+    { article: "die", en: "bank", de: "die Bank" },
+    { article: "die", en: "construction site", de: "die Baustelle" },
+    { article: "die", en: "job application", de: "die Bewerbung" },
+    { article: "die", en: "cloud", de: "die Wolke" },
+    { article: "die", en: "library", de: "die Bibliothek" },
+    { article: "die", en: "pear", de: "die Birne" },
+    { article: "die", en: "request / plea", de: "die Bitte" },
+    { article: "die", en: "flower", de: "die Blume" },
+    { article: "die", en: "blouse", de: "die Bluse" },
+    { article: "die", en: "bean", de: "die Bohne" },
+    { article: "die", en: "postage stamp", de: "die Briefmarke" },
+    { article: "die", en: "glasses (spectacles)", de: "die Brille" },
+    { article: "die", en: "bridge", de: "die Brücke" },
+    { article: "die", en: "cafeteria", de: "die Cafeteria" },
+    { article: "die", en: "female boss", de: "die Chefin" },
+    { article: "die", en: "cream / lotion", de: "die Creme" },
+    { article: "die", en: "lady / woman", de: "die Dame" },
+    { article: "die", en: "file (computer)", de: "die Datei" },
+    { article: "die", en: "disco / nightclub", de: "die Disco" },
+    { article: "die", en: "shower", de: "die Dusche" },
+    { article: "die", en: "corner", de: "die Ecke" },
+    { article: "die", en: "wife", de: "die Ehefrau" },
+    { article: "die", en: "invitation", de: "die Einladung" },
+    { article: "die", en: "email", de: "die (E-)Mail" },
+    { article: "die", en: "apology", de: "die Entschuldigung" },
+    { article: "die", en: "experience", de: "die Erfahrung" },
+    { article: "die", en: "permission", de: "die Erlaubnis" },
+    { article: "die", en: "discount / reduction", de: "die Ermäßigung" },
+    { article: "die", en: "departure", de: "die Abfahrt" },
+    { article: "die", en: "ticket (transport)", de: "die Fahrkarte" },
+    { article: "die", en: "family", de: "die Familie" },
+    { article: "die", en: "color", de: "die Farbe" },
+    { article: "die", en: "celebration", de: "die Feier" },
+    { article: "die", en: "holidays / vacation", de: "die Ferien" },
+    { article: "die", en: "company / firm", de: "die Firma" },
+    { article: "die", en: "bottle", de: "die Flasche" },
+    { article: "die", en: "question", de: "die Frage" },
+    { article: "die", en: "woman / Mrs.", de: "die Frau" },
+    { article: "die", en: "free time / leisure", de: "die Freizeit" },
+    { article: "die", en: "friend / girlfriend", de: "die Freundin" },
+    { article: "die", en: "guided tour / leadership", de: "die Führung" },
+    { article: "die", en: "lost and found items", de: "die Fundsachen" },
+    { article: "die", en: "fork", de: "die Gabel" },
+    { article: "die", en: "garage", de: "die Garage" },
+    { article: "die", en: "wallet / purse", de: "die Geldbörse" },
+    { article: "die", en: "story / history", de: "die Geschichte" },
+    { article: "die", en: "guitar", de: "die Gitarre" },
+    { article: "die", en: "flu", de: "die Grippe" },
+    { article: "die", en: "size", de: "die Größe" },
+    { article: "die", en: "group", de: "die Gruppe" },
+    { article: "die", en: "health", de: "die Gesundheit" },
+    { article: "die", en: "hall / gym", de: "die Halle" },
+    { article: "die", en: "bus/tram stop", de: "die Haltestelle" },
+    { article: "die", en: "hand", de: "die Hand" },
+    { article: "die", en: "capital city", de: "die Hauptstadt" },
+    { article: "die", en: "homeland", de: "die Heimat" },
+    { article: "die", en: "heater / heating", de: "die Heizung" },
+    { article: "die", en: "help", de: "die Hilfe" },
+    { article: "die", en: "wedding", de: "die Hochzeit" },
+    { article: "die", en: "homepage", de: "die Homepage" },
+    { article: "die", en: "pants / trousers", de: "die Hose" },
+    { article: "die", en: "idea", de: "die Idee" },
+    { article: "die", en: "information", de: "die Information" },
+    { article: "die", en: "island", de: "die Insel" },
+    { article: "die", en: "jacket", de: "die Jacke" },
+    { article: "die", en: "jeans", de: "die Jeans" },
+    { article: "die", en: "youth", de: "die Jugend" },
+    { article: "die", en: "camera", de: "die Kamera" },
+    { article: "die", en: "card / map / ticket", de: "die Karte" },
+    { article: "die", en: "potato", de: "die Kartoffel" },
+    { article: "die", en: "cash register / checkout", de: "die Kasse" },
+    { article: "die", en: "cat", de: "die Katze" },
+    { article: "die", en: "knowledge / skills", de: "die Kenntnisse" },
+    { article: "die", en: "chain / necklace", de: "die Kette" },
+    { article: "die", en: "church", de: "die Kirche" },
+    { article: "die", en: "clothing", de: "die Kleidung" },
+    { article: "die", en: "female colleague", de: "die Kollegin" },
+    { article: "die", en: "cosmetics", de: "die Kosmetik" },
+    { article: "die", en: "illness / disease", de: "die Krankheit" },
+    { article: "die", en: "intersection / crossroads", de: "die Kreuzung" },
+    { article: "die", en: "kitchen", de: "die Küche" },
+    { article: "die", en: "culture", de: "die Kultur" },
+    { article: "die", en: "female customer", de: "die Kundin" },
+    { article: "die", en: "art", de: "die Kunst" },
+    { article: "die", en: "lamp", de: "die Lampe" },
+    { article: "die", en: "people", de: "die Leute" },
+    { article: "die", en: "lie / falsehood", de: "die Lüge" },
+    { article: "die", en: "desire / pleasure", de: "die Lust" },
+    { article: "die", en: "mailbox", de: "die Mailbox" },
+    { article: "die", en: "team (sports)", de: "die Mannschaft" },
+    { article: "die", en: "machine", de: "die Maschine" },
+    { article: "die", en: "opinion", de: "die Meinung" },
+    { article: "die", en: "quantity / amount", de: "die Menge" },
+    { article: "die", en: "fair / trade show", de: "die Messe" },
+    { article: "die", en: "rent", de: "die Miete" },
+    { article: "die", en: "milk", de: "die Milch" },
+    { article: "die", en: "middle / center", de: "die Mitte" },
+    { article: "die", en: "furniture", de: "die Möbel" },
+    { article: "die", en: "fashion", de: "die Mode" },
+    { article: "die", en: "music", de: "die Musik" },
+    { article: "die", en: "hat / cap", de: "die Mütze" },
+    { article: "die", en: "neighbor (female)", de: "die Nachbarin" },
+    { article: "die", en: "news / message", de: "die Nachricht" },
+    { article: "die", en: "proximity / nearness", de: "die Nähe" },
+    { article: "die", en: "nature", de: "die Natur" },
+    { article: "die", en: "grade / mark", de: "die Note" },
+    { article: "die", en: "note", de: "die Notiz" },
+    { article: "die", en: "noodle", de: "die Nudel" },
+    { article: "die", en: "number", de: "die Nummer" },
+    { article: "die", en: "orange", de: "die Orange" },
+    { article: "die", en: "order / tidiness", de: "die Ordnung" },
+    { article: "die", en: "papers / documents", de: "die Papiere" },
+    { article: "die", en: "partner (female)", de: "die Partnerin" },
+    { article: "die", en: "party", de: "die Party" },
+    { article: "die", en: "break / pause", de: "die Pause" },
+    { article: "die", en: "person", de: "die Person" },
+    { article: "die", en: "plant", de: "die Pflanze" },
+    { article: "die", en: "pizza", de: "die Pizza" },
+    { article: "die", en: "police", de: "die Polizei" },
+    { article: "die", en: "French fries", de: "die Pommes frites" },
+    { article: "die", en: "portion / serving", de: "die Portion" },
+    { article: "die", en: "post / mail", de: "die Post" },
+    { article: "die", en: "postcard", de: "die Postkarte" },
+    { article: "die", en: "postal code", de: "die Postleitzahl" },
+    { article: "die", en: "practice / clinic", de: "die Praxis" },
+    { article: "die", en: "exam / test", de: "die Prüfung" },
+    { article: "die", en: "quality", de: "die Qualität" },
+    { article: "die", en: "bill / invoice", de: "die Rechnung" },
+    { article: "die", en: "row / series", de: "die Reihe" },
+    { article: "die", en: "cleaning", de: "die Reinigung" },
+    { article: "die", en: "trip / journey", de: "die Reise" },
+    { article: "die", en: "retiree (female)", de: "die Rentnerin" },
+    { article: "die", en: "repair", de: "die Reparatur" },
+    { article: "die", en: "reception (desk)", de: "die Rezeption" },
+    { article: "die", en: "rose", de: "die Rose" },
+    { article: "die", en: "peace / quiet", de: "die Ruhe" },
+    { article: "die", en: "thing / matter", de: "die Sache" },
+    { article: "die", en: "scissors", de: "die Schere" },
+    { article: "die", en: "chocolate", de: "die Schokolade" },
+    { article: "die", en: "school", de: "die Schule" },
+    { article: "die", en: "female student", de: "die Schülerin" },
+    { article: "die", en: "sightseeing attraction", de: "die Sehenswürdigkeit" },
+    { article: "die", en: "soap", de: "die Seife" },
+    { article: "die", en: "page / side", de: "die Seite" },
+    { article: "die", en: "broadcast / program", de: "die Sendung" },
+    { article: "die", en: "situation", de: "die Situation" },
+    { article: "die", en: "sun", de: "die Sonne" },
+    { article: "die", en: "menu", de: "die Speisekarte" },
+    { article: "die", en: "language", de: "die Sprache" },
+    { article: "die", en: "city / town", de: "die Stadt" },
+    { article: "die", en: "position / job", de: "die Stelle" },
+    { article: "die", en: "street", de: "die Straße" },
+    { article: "die", en: "female university student", de: "die Studentin" },
+    { article: "die", en: "soup", de: "die Suppe" },
+    { article: "die", en: "sweets / candy", de: "die Süßigkeiten" },
+    { article: "die", en: "tablet / pill", de: "die Tablette" },
+    { article: "die", en: "board / blackboard", de: "die Tafel" },
+    { article: "die", en: "bag / purse", de: "die Tasche" },
+    { article: "die", en: "cup / mug", de: "die Tasse" },
+    { article: "die", en: "toilet / bathroom", de: "die Toilette" },
+    { article: "die", en: "tomato", de: "die Tomate" },
+    { article: "die", en: "cake / tart", de: "die Torte" },
+    { article: "die", en: "tour", de: "die Tour" },
+    { article: "die", en: "tourist (female)", de: "die Touristin" },
+    { article: "die", en: "stairs", de: "die Treppe" },
+    { article: "die", en: "door", de: "die Tür" },
+    { article: "die", en: "clock / watch", de: "die Uhr" },
+    { article: "die", en: "university", de: "die Universität" },
+    { article: "die", en: "accommodation", de: "die Unterkunft" },
+    { article: "die", en: "signature", de: "die Unterschrift" },
+    { article: "die", en: "event", de: "die Veranstaltung" },
+    { article: "die", en: "landlady", de: "die Vermieterin" },
+    { article: "die", en: "delay", de: "die Verspätung" },
+    { article: "die", en: "laundry", de: "die Wäsche" },
+    { article: "die", en: "website", de: "die Webseite" },
+    { article: "die", en: "world", de: "die Welt" },
+    { article: "die", en: "workshop / garage", de: "die Werkstatt" },
+    { article: "die", en: "apartment / flat", de: "die Wohnung" },
+    { article: "die", en: "sausage", de: "die Wurst" },
+    { article: "die", en: "number (numeral)", de: "die Zahl" },
+    { article: "die", en: "time", de: "die Zeit" },
+    { article: "die", en: "magazine", de: "die Zeitschrift" },
+    { article: "die", en: "newspaper", de: "die Zeitung" },
+    { article: "die", en: "lemon", de: "die Zitrone" },
+    { article: "die", en: "achievement / performance", de: "die Leistung" },
+    { article: "die", en: "possibility", de: "die Möglichkeit" },
+    { article: "die", en: "hour", de: "die Stunde" },
+    { article: "die", en: "the hostel", de: "die Herberge" }
+];
+
+const A2_IMPERATIVE = [
+    { en: "go", verb: "gehen", du: "Geh!", sie: "Gehen Sie!" },
+    { en: "come", verb: "kommen", du: "Komm!", sie: "Kommen Sie!" },
+    { en: "make / do", verb: "machen", du: "Mach!", sie: "Machen Sie!" },
+    { en: "give", verb: "geben", du: "Gib!", sie: "Geben Sie!" },
+    { en: "see", verb: "sehen", du: "Sieh!", sie: "Sehen Sie!" },
+    { en: "write", verb: "schreiben", du: "Schreib!", sie: "Schreiben Sie!" },
+    { en: "hear / listen", verb: "hören", du: "Hör!", sie: "Hören Sie!" },
+    { en: "take", verb: "nehmen", du: "Nimm!", sie: "Nehmen Sie!" },
+    { en: "stay", verb: "bleiben", du: "Bleib!", sie: "Bleiben Sie!" },
+    { en: "wait", verb: "warten", du: "Warte!", sie: "Warten Sie!" },
+    { en: "drink", verb: "trinken", du: "Trink!", sie: "Trinken Sie!" },
+    { en: "eat", verb: "essen", du: "Iss!", sie: "Essen Sie!" },
+    { en: "help", verb: "helfen", du: "Hilf!", sie: "Helfen Sie!" },
+    { en: "run", verb: "laufen", du: "Lauf!", sie: "Laufen Sie!" },
+    { en: "speak", verb: "sprechen", du: "Sprich!", sie: "Sprechen Sie!" },
+    { en: "read", verb: "lesen", du: "Lies!", sie: "Lesen Sie!" },
+    { en: "sleep", verb: "schlafen", du: "Schlaf!", sie: "Schlafen Sie!" },
+    { en: "open", verb: "öffnen", du: "Öffne!", sie: "Öffnen Sie!" },
+    { en: "close", verb: "schließen", du: "Schließ!", sie: "Schließen Sie!" },
+    { en: "work", verb: "arbeiten", du: "Arbeite!", sie: "Arbeiten Sie!" },
+    { en: "learn", verb: "lernen", du: "Lern!", sie: "Lernen Sie!" },
+    { en: "buy", verb: "kaufen", du: "Kauf!", sie: "Kaufen Sie!" },
+    { en: "play", verb: "spielen", du: "Spiel!", sie: "Spielen Sie!" },
+    { en: "show", verb: "zeigen", du: "Zeig!", sie: "Zeigen Sie!" },
+    { en: "ask", verb: "fragen", du: "Frag!", sie: "Fragen Sie!" }
+];
+
+// ============================================================
+// DATA REGISTRY
+// ============================================================
+const DATA = {
+    a1: {
+        verbs: A1_VERBS,
+        trennbar: A1_TRENNBAR,
+        reflexive: A1_REFLEXIVE,
+        adj: A1_ADJ,
+        nouns: A1_NOUNS,
+        others: A1_OTHERS
+    },
+    a2: {
+        verbs: A2_VERBS,
+        reflexive: A2_REFLEXIVE,
+        trennbar: A2_TRENNBAR,
+        adj: A2_ADJ,
+        nouns: A2_NOUNS,
+        imperative: A2_IMPERATIVE
+    }
+};
+
+const LEVEL_TABS = {
+    a1: ['verbs', 'trennbar', 'reflexive', 'adj', 'nouns', 'others'],
+    a2: ['verbs', 'reflexive', 'trennbar', 'adj', 'nouns', 'imperative']
+};
+
+const TAB_ICONS = {
+    verbs: '📝 Verbs',
+    trennbar: '✂️ Trennbar',
+    reflexive: '🔄 Reflexive',
+    adj: '📊 Adj/Adv',
+    nouns: '📚 Nouns',
+    others: '🌍 Others',
+    imperative: '📢 Imperative'
+};
+
+const TAB_LABELS = {
+    verbs: 'Verbs',
+    trennbar: 'Trennbar Verbs',
+    reflexive: 'Reflexive',
+    adj: 'Adjectives & Adverbs',
+    nouns: 'Nouns',
+    others: 'Others / Sonstiges',
+    imperative: 'Imperative'
+};
+
+// ============================================================
+// STATE
+// ============================================================
+let currentLevel = 'a1';
+let currentTab = 'verbs';
+let currentFilter = 'all';
+let filteredItems = [];
+let currentIndex = 0;
+let isFlipped = false;
+
+// Progress per level per tab
+const progressStore = {};
+
+function initProgressStore() {
+    ['a1', 'a2'].forEach(level => {
+        progressStore[level] = {};
+        LEVEL_TABS[level].forEach(tab => {
+            progressStore[level][tab] = new Map();
+            DATA[level][tab].forEach(item => {
+                const key = getItemKey(tab, item);
+                progressStore[level][tab].set(key, { right: 0, wrong: 0, weak: false });
+            });
+        });
+    });
+}
+
+function getItemKey(tab, item) {
+    switch(tab) {
+        case 'verbs':
+        case 'trennbar':
+        case 'reflexive':
+            return item.en + '|' + item.form + '|' + item.past;
+        case 'adj':
+        case 'nouns':
+        case 'others':
+            return (item.cat || '') + '|' + (item.article || '') + '|' + item.en + '|' + item.de;
+        case 'imperative':
+            return item.en + '|' + item.du + '|' + item.sie + '|' + item.verb;
+        default:
+            return JSON.stringify(item);
+    }
+}
+
+function getCurrentData() {
+    return DATA[currentLevel][currentTab];
+}
+
+function getCurrentProgressMap() {
+    return progressStore[currentLevel][currentTab];
+}
+
+// ============================================================
+// DOM REFS
+// ============================================================
+const flashcard = document.getElementById('flashcard');
+const frontEn = document.getElementById('frontEn');
+const frontHint = document.getElementById('frontHint');
+const backCategory = document.getElementById('backCategory');
+const backFormContainer = document.getElementById('backFormContainer');
+const backLabel = document.getElementById('backLabel');
+const backEn = document.getElementById('backEn');
+const cardNumber = document.getElementById('cardNumber');
+const currentIndexDisplay = document.getElementById('currentIndexDisplay');
+const totalCountDisplay = document.getElementById('totalCountDisplay');
+const progressFill = document.getElementById('progressFill');
+const countDisplay = document.getElementById('countDisplay');
+const modeLabel = document.getElementById('modeLabel');
+const subheadText = document.getElementById('subheadText');
+const metricsLevelLabel = document.getElementById('metricsLevelLabel');
+
+const filterInput = document.getElementById('filterInput');
+const allModeBtn = document.getElementById('allModeBtn');
+const weakModeBtn = document.getElementById('weakModeBtn');
+const correctBtn = document.getElementById('correctBtn');
+const wrongBtn = document.getElementById('wrongBtn');
+const resetCardBtn = document.getElementById('resetCardBtn');
+const toggleMetricsBtn = document.getElementById('toggleMetricsBtn');
+const closeMetricsBtn = document.getElementById('closeMetricsBtn');
+const metricsPanel = document.getElementById('metricsPanel');
+const prevBtn = document.getElementById('prevBtn');
+const nextBtn = document.getElementById('nextBtn');
+const shuffleBtn = document.getElementById('shuffleBtn');
+const downloadCsvBtn = document.getElementById('downloadCsvBtn');
+const downloadTxtBtn = document.getElementById('downloadTxtBtn');
+const printBtn = document.getElementById('printBtn');
+
+const totalRightEl = document.getElementById('totalRight');
+const totalWrongEl = document.getElementById('totalWrong');
+const totalSeenEl = document.getElementById('totalSeen');
+const accuracyDisplay = document.getElementById('accuracyDisplay');
+const weakCountDisplay = document.getElementById('weakCountDisplay');
+const weakListEl = document.getElementById('weakList');
+
+const tabSelector = document.getElementById('tabSelector');
+const levelSwitcher = document.getElementById('levelSwitcher');
+
+// ============================================================
+// THEME
+// ============================================================
+const themeSwitch = document.getElementById('themeSwitch');
+function setTheme(theme) {
+    document.documentElement.setAttribute('data-theme', theme);
+    localStorage.setItem('theme', theme);
+}
+function toggleTheme() {
+    const current = document.documentElement.getAttribute('data-theme');
+    setTheme(current === 'dark' ? 'light' : 'dark');
+}
+const savedTheme = localStorage.getItem('theme');
+if (savedTheme) {
+    setTheme(savedTheme);
+} else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+    setTheme('dark');
+}
+themeSwitch.addEventListener('click', toggleTheme);
+themeSwitch.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        toggleTheme();
+    }
+});
+
+// ============================================================
+// TAB / LEVEL RENDERING
+// ============================================================
+function renderTabs() {
+    const tabs = LEVEL_TABS[currentLevel];
+    tabSelector.innerHTML = tabs.map(tab =>
+        `<button data-tab="${tab}"${tab === currentTab ? ' class="active"' : ''}>${TAB_ICONS[tab]}</button>`
+    ).join('');
+}
+
+function switchLevel(level) {
+    currentLevel = level;
+    document.querySelectorAll('#levelSwitcher button').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.level === level);
+    });
+    // Pick first tab for the level
+    currentTab = LEVEL_TABS[level][0];
+    renderTabs();
+    currentIndex = 0;
+    isFlipped = false;
+    flashcard.classList.remove('flipped');
+    updateHeader();
+    applyFilter();
+    updateMetrics();
+    // Save preference
+    localStorage.setItem('preferredLevel', level);
+}
+
+function switchTab(tab) {
+    currentTab = tab;
+    currentIndex = 0;
+    isFlipped = false;
+    flashcard.classList.remove('flipped');
+    document.querySelectorAll('#tabSelector button').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.tab === tab);
+    });
+    updateHeader();
+    applyFilter();
+    updateMetrics();
+}
+
+function updateHeader() {
+    modeLabel.textContent = currentLevel.toUpperCase() + ' · ' + TAB_LABELS[currentTab];
+    metricsLevelLabel.textContent = currentLevel.toUpperCase();
+
+    let sub = '';
+    if (currentTab === 'adj' || currentTab === 'nouns' || currentTab === 'others') {
+        sub = 'English → German — click to flip';
+    } else if (currentTab === 'imperative') {
+        sub = 'Infinitive → du & Sie imperative — click to flip';
+    } else {
+        sub = 'Present (we/they/Sie) & Past Tense Ib — click to flip';
+    }
+    subheadText.textContent = sub;
+}
+
+// ============================================================
+// RENDER CARD
+// ============================================================
+function renderCard() {
+    if (filteredItems.length === 0) {
+        frontEn.textContent = currentFilter === 'weak' ? '🎉 No weak items!' : '😕 No items match';
+        frontHint.textContent = currentFilter === 'weak' ? 'You know all of them!' : 'try adjusting your filter';
+        backCategory.classList.add('hidden');
+        backFormContainer.innerHTML = '<div class="form">—</div>';
+        backEn.textContent = '—';
+        backLabel.textContent = '';
+        cardNumber.textContent = '0 / 0';
+        currentIndexDisplay.textContent = '0';
+        totalCountDisplay.textContent = '0';
+        progressFill.style.width = '0%';
+        flashcard.classList.remove('flipped');
+        isFlipped = false;
+        countDisplay.textContent = '0 items';
+        return;
+    }
+
+    if (currentIndex >= filteredItems.length) currentIndex = 0;
+    if (currentIndex < 0) currentIndex = filteredItems.length - 1;
+
+    const item = filteredItems[currentIndex];
+    backCategory.classList.add('hidden');
+    backCategory.textContent = '';
+
+    if (currentTab === 'imperative') {
+        frontEn.textContent = `${item.verb} — ${item.en}`;
+        frontHint.textContent = 'click to reveal imperative forms';
+        backFormContainer.innerHTML = `<div class="form-row">
+            <span class="label">du (informal)</span>
+            <span class="value">${item.du}</span>
+        </div>
+        <div class="form-row">
+            <span class="label">Sie (formal)</span>
+            <span class="value">${item.sie}</span>
+        </div>`;
+        backLabel.textContent = 'Imperative';
+        backEn.textContent = item.en;
+    } else if (currentTab === 'adj' || currentTab === 'others') {
+        frontEn.textContent = item.en;
+        frontHint.textContent = 'click to reveal German';
+        backFormContainer.innerHTML = `<div class="form">${item.de}</div>`;
+        backLabel.textContent = currentTab === 'adj' ? 'Adjective / Adverb' : 'Vocabulary';
+        backEn.textContent = item.en;
+        if (item.cat) {
+            backCategory.textContent = item.cat;
+            backCategory.classList.remove('hidden');
+        }
+    } else if (currentTab === 'nouns') {
+        frontEn.textContent = item.en;
+        frontHint.textContent = 'click to reveal article + noun';
+        backFormContainer.innerHTML = `<div class="form">${item.de}</div>`;
+        backLabel.textContent = item.article.toUpperCase() + ' — ' + (
+            item.article === 'der' ? 'Masculine' :
+            item.article === 'das' ? 'Neuter' : 'Feminine'
+        );
+        backEn.textContent = item.en;
+    } else {
+        // verbs / reflexive / trennbar
+        frontEn.textContent = item.en;
+        frontHint.textContent = 'click to reveal Present & Past';
+        backFormContainer.innerHTML = `<div class="form-row">
+            <span class="label">Present (we/they/Sie)</span>
+            <span class="value">${item.form}</span>
+        </div>
+        <div class="form-row">
+            <span class="label">Past Tense Ib (Perfekt)</span>
+            <span class="value past">${item.past}</span>
+        </div>`;
+        backLabel.textContent = '';
+        backEn.textContent = '';
+    }
+
+    cardNumber.textContent = `${currentIndex + 1} / ${filteredItems.length}`;
+    currentIndexDisplay.textContent = currentIndex + 1;
+    totalCountDisplay.textContent = filteredItems.length;
+    progressFill.style.width = `${((currentIndex + 1) / filteredItems.length) * 100}%`;
+    countDisplay.textContent = `${filteredItems.length} items`;
+
+    if (isFlipped) {
+        flashcard.classList.remove('flipped');
+        isFlipped = false;
+    }
+}
+
+// ============================================================
+// FILTER
+// ============================================================
+function applyFilter() {
+    const data = getCurrentData();
+    const query = filterInput.value.toLowerCase().trim();
+    const map = getCurrentProgressMap();
+
+    let source;
+    if (currentFilter === 'weak') {
+        source = data.filter(item => {
+            const p = map.get(getItemKey(currentTab, item));
+            return p && p.weak;
+        });
+    } else {
+        source = [...data];
+    }
+
+    if (query) {
+        source = source.filter(item => {
+            const en = (item.en || '').toLowerCase();
+            const form = (item.form || '').toLowerCase();
+            const past = (item.past || '').toLowerCase();
+            const de = (item.de || '').toLowerCase();
+            const cat = (item.cat || '').toLowerCase();
+            const article = (item.article || '').toLowerCase();
+            const du = (item.du || '').toLowerCase();
+            const sie = (item.sie || '').toLowerCase();
+            const verb = (item.verb || '').toLowerCase();
+            return en.includes(query) || form.includes(query) || past.includes(query) ||
+                   de.includes(query) || cat.includes(query) || article.includes(query) ||
+                   du.includes(query) || sie.includes(query) || verb.includes(query);
+        });
+    }
+
+    filteredItems = source;
+    currentIndex = 0;
+    renderCard();
+}
+
+function setFilterMode(mode) {
+    currentFilter = mode;
+    allModeBtn.classList.toggle('active', mode === 'all');
+    weakModeBtn.classList.toggle('active', mode === 'weak');
+    applyFilter();
+}
+
+// ============================================================
+// NAVIGATION
+// ============================================================
+function nextCard() {
+    if (filteredItems.length === 0) return;
+    currentIndex = (currentIndex + 1) % filteredItems.length;
+    renderCard();
+}
+function prevCard() {
+    if (filteredItems.length === 0) return;
+    currentIndex = (currentIndex - 1 + filteredItems.length) % filteredItems.length;
+    renderCard();
+}
+function shuffleArray(arr) {
+    for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+    }
+    return arr;
+}
+function shuffleCards() {
+    if (filteredItems.length === 0) return;
+    shuffleArray(filteredItems);
+    currentIndex = 0;
+    renderCard();
+}
+function toggleFlip() {
+    if (filteredItems.length === 0) return;
+    flashcard.classList.toggle('flipped');
+    isFlipped = !isFlipped;
+    frontHint.textContent = isFlipped ? 'click to hide' : 'click to reveal';
+}
+
+// ============================================================
+// PROGRESS
+// ============================================================
+function updateProgress(item, type) {
+    const key = getItemKey(currentTab, item);
+    const map = getCurrentProgressMap();
+    const p = map.get(key);
+    if (!p) return;
+    if (type === 'right') { p.right++; p.weak = false; }
+    else if (type === 'wrong') { p.wrong++; p.weak = true; }
+    map.set(key, p);
+    updateMetrics();
+    renderCard();
+}
+function resetCardProgress(item) {
+    const key = getItemKey(currentTab, item);
+    const map = getCurrentProgressMap();
+    const p = map.get(key);
+    if (!p) return;
+    p.right = 0; p.wrong = 0; p.weak = false;
+    map.set(key, p);
+    updateMetrics();
+    renderCard();
+}
+function getWeakItems() {
+    const data = getCurrentData();
+    const map = getCurrentProgressMap();
+    return data.filter(item => {
+        const p = map.get(getItemKey(currentTab, item));
+        return p && p.weak;
+    });
+}
+
+// ============================================================
+// METRICS
+// ============================================================
+function updateMetrics() {
+    const map = getCurrentProgressMap();
+    let totalRight = 0, totalWrong = 0, totalSeen = 0;
+    for (const [, p] of map) {
+        if (p.right > 0 || p.wrong > 0) totalSeen++;
+        totalRight += p.right;
+        totalWrong += p.wrong;
+    }
+    const totalAnswers = totalRight + totalWrong;
+    const accuracy = totalAnswers > 0 ? Math.round((totalRight / totalAnswers) * 100) : 0;
+    const weakItems = getWeakItems();
+
+    totalRightEl.textContent = totalRight;
+    totalWrongEl.textContent = totalWrong;
+    totalSeenEl.textContent = totalSeen;
+    accuracyDisplay.textContent = accuracy + '%';
+    weakCountDisplay.textContent = weakItems.length;
+
+    if (weakItems.length === 0) {
+        weakListEl.innerHTML = '<div class="empty-msg">🎉 No weak items! You know all of them!</div>';
+    } else {
+        weakListEl.innerHTML = weakItems.map(item => {
+            let display = '';
+            if (currentTab === 'imperative') {
+                display = `<span class="en">${item.verb} (${item.en})</span> → <span class="form">du: ${item.du} | Sie: ${item.sie}</span>`;
+            } else if (currentTab === 'nouns' || currentTab === 'adj' || currentTab === 'others') {
+                display = `<span class="en">${item.en}</span> → <span class="form">${item.de}</span>`;
+            } else {
+                display = `<span class="en">${item.en}</span> → <span class="form">${item.form}</span> · <span class="form past">${item.past}</span>`;
+            }
+            return `<div class="weak-item">
+                <span>${display}</span>
+                <button class="remove-btn" data-key="${getItemKey(currentTab, item)}">✕ remove</button>
+            </div>`;
+        }).join('');
+
+        weakListEl.querySelectorAll('.remove-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                const key = this.dataset.key;
+                const p = map.get(key);
+                if (p) {
+                    p.right = 0; p.wrong = 0; p.weak = false;
+                    map.set(key, p);
+                    if (currentFilter === 'weak') applyFilter();
+                    updateMetrics();
+                    renderCard();
+                }
+            });
+        });
+    }
+}
+
+// ============================================================
+// HANDLERS
+// ============================================================
+function handleCorrect() {
+    if (filteredItems.length === 0) return;
+    const item = filteredItems[currentIndex];
+    updateProgress(item, 'right');
+    setTimeout(() => { if (filteredItems.length > 0) nextCard(); }, 300);
+}
+function handleWrong() {
+    if (filteredItems.length === 0) return;
+    const item = filteredItems[currentIndex];
+    updateProgress(item, 'wrong');
+    setTimeout(() => { if (filteredItems.length > 0) nextCard(); }, 300);
+}
+function handleReset() {
+    if (filteredItems.length === 0) return;
+    const item = filteredItems[currentIndex];
+    resetCardProgress(item);
+    if (currentFilter === 'weak') applyFilter();
+    renderCard();
+}
+function toggleMetrics() {
+    metricsPanel.classList.toggle('open');
+    if (metricsPanel.classList.contains('open')) updateMetrics();
+}
+
+// ============================================================
+// EXPORT
+// ============================================================
+function getWeakListData() {
+    const weak = getWeakItems();
+    return weak.map(item => {
+        const row = { English: item.en };
+        if (currentTab === 'imperative') {
+            row['du'] = item.du;
+            row['Sie'] = item.sie;
+            row['Verb'] = item.verb;
+        } else if (currentTab === 'nouns' || currentTab === 'adj' || currentTab === 'others') {
+            row['German'] = item.de;
+        } else {
+            row['Present'] = item.form;
+            row['PastTenseIb'] = item.past;
+        }
+        return row;
+    });
+}
+function downloadCSV() {
+    const data = getWeakListData();
+    if (data.length === 0) { alert('No words in your "Don\'t Know" list yet!'); return; }
+    const headers = Object.keys(data[0]);
+    let csv = headers.join(',') + '\n';
+    data.forEach(row => { csv += headers.map(h => `"${row[h]}"`).join(',') + '\n'; });
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = `weak_${currentLevel}_${currentTab}.csv`;
+    link.click();
+    URL.revokeObjectURL(link.href);
+}
+function downloadTXT() {
+    const data = getWeakListData();
+    if (data.length === 0) { alert('No words in your "Don\'t Know" list yet!'); return; }
+    let txt = `=== Words I Marked "Don't Know" (${currentLevel.toUpperCase()} ${TAB_LABELS[currentTab]}) ===\n\n`;
+    txt += '─'.repeat(50) + '\n\n';
+    data.forEach((row, i) => { txt += `${i + 1}. ${Object.values(row).join(' → ')}\n`; });
+    txt += '\n' + '─'.repeat(50) + `\nTotal: ${data.length} words\n`;
+    const blob = new Blob([txt], { type: 'text/plain;charset=utf-8;' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = `weak_${currentLevel}_${currentTab}.txt`;
+    link.click();
+    URL.revokeObjectURL(link.href);
+}
+function printMetrics() {
+    if (!metricsPanel.classList.contains('open')) toggleMetrics();
+    setTimeout(() => { window.print(); }, 300);
+}
+
+// ============================================================
+// EVENTS
+// ============================================================
+flashcard.addEventListener('click', toggleFlip);
+prevBtn.addEventListener('click', prevCard);
+nextBtn.addEventListener('click', nextCard);
+shuffleBtn.addEventListener('click', shuffleCards);
+correctBtn.addEventListener('click', handleCorrect);
+wrongBtn.addEventListener('click', handleWrong);
+resetCardBtn.addEventListener('click', handleReset);
+allModeBtn.addEventListener('click', () => setFilterMode('all'));
+weakModeBtn.addEventListener('click', () => setFilterMode('weak'));
+toggleMetricsBtn.addEventListener('click', toggleMetrics);
+closeMetricsBtn.addEventListener('click', toggleMetrics);
+downloadCsvBtn.addEventListener('click', downloadCSV);
+downloadTxtBtn.addEventListener('click', downloadTXT);
+printBtn.addEventListener('click', printMetrics);
+filterInput.addEventListener('input', applyFilter);
+
+tabSelector.addEventListener('click', (e) => {
+    const btn = e.target.closest('button');
+    if (btn && btn.dataset.tab) switchTab(btn.dataset.tab);
+});
+
+levelSwitcher.addEventListener('click', (e) => {
+    const btn = e.target.closest('button');
+    if (btn && btn.dataset.level) switchLevel(btn.dataset.level);
+});
+
+document.addEventListener('keydown', (e) => {
+    if (e.target === filterInput) return;
+    switch (e.key) {
+        case 'ArrowLeft': e.preventDefault(); prevCard(); break;
+        case 'ArrowRight': e.preventDefault(); nextCard(); break;
+        case ' ': e.preventDefault(); toggleFlip(); break;
+        case 'r': case 'R': handleCorrect(); break;
+        case 'w': case 'W': handleWrong(); break;
+    }
+});
+
+// ============================================================
+// SERVICE WORKER REGISTRATION
+// ============================================================
+if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+        navigator.serviceWorker.register('sw.js').then(reg => {
+            // Check for updates periodically
+            setInterval(() => reg.update(), 60 * 60 * 1000);
+        }).catch(err => console.log('SW registration failed:', err));
+
+        let refreshing = false;
+        navigator.serviceWorker.addEventListener('controllerchange', () => {
+            if (refreshing) return;
+            refreshing = true;
+            window.location.reload();
+        });
+
+        // Show reload banner when new SW is waiting
+        navigator.serviceWorker.ready.then(reg => {
+            reg.addEventListener('updatefound', () => {
+                const newWorker = reg.installing;
+                newWorker.addEventListener('statechange', () => {
+                    if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                        document.getElementById('updateBanner').classList.add('show');
+                    }
+                });
+            });
+        });
+    });
+}
+
+document.getElementById('reloadBtn').addEventListener('click', () => {
+    if (navigator.serviceWorker.controller) {
+        navigator.serviceWorker.controller.postMessage({ type: 'SKIP_WAITING' });
+    } else {
+        window.location.reload();
+    }
+});
+
+// ============================================================
+// INIT
+// ============================================================
+function init() {
+    initProgressStore();
+    const savedLevel = localStorage.getItem('preferredLevel');
+    if (savedLevel && ['a1', 'a2'].includes(savedLevel)) {
+        currentLevel = savedLevel;
+    }
+    document.querySelectorAll('#levelSwitcher button').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.level === currentLevel);
+    });
+    currentTab = LEVEL_TABS[currentLevel][0];
+    renderTabs();
+    updateHeader();
+    applyFilter();
+    updateMetrics();
+}
+init();
+</script>
+</body>
+</html>
